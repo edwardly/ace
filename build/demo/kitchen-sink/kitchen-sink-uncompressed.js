@@ -42,7 +42,9 @@
  */
  
 (function() {
-    
+
+var ACE_NAMESPACE = "";
+
 var global = (function() {
     return this;
 })();
@@ -69,11 +71,6 @@ var _define = function(module, deps, payload) {
         
     _define.modules[module] = payload;
 };
-if (global.define)
-    _define.original = global.define;
-    
-global.define = _define;
-
 
 /**
  * Get at functionality define()ed using the function above
@@ -108,15 +105,6 @@ var _require = function(parentId, module, callback) {
     }
 };
 
-if (global.require)
-    _require.original = global.require;
-    
-global.require = function(module, callback) {
-    return _require("", module, callback);
-};
-
-global.require.packaged = true;
-
 var normalizeModule = function(parentId, moduleName) {
     // normalize plugin requires
     if (moduleName.indexOf("!") !== -1) {
@@ -137,7 +125,6 @@ var normalizeModule = function(parentId, moduleName) {
     return moduleName;
 };
 
-
 /**
  * Internal function to lookup moduleNames and resolve them by calling the
  * definition function if needed.
@@ -156,7 +143,8 @@ var lookup = function(parentId, moduleName) {
         var mod = {
             id: moduleName, 
             uri: '',
-            exports: exports
+            exports: exports,
+            packaged: true
         };
         
         var req = function(module, callback) {
@@ -173,6 +161,32 @@ var lookup = function(parentId, moduleName) {
 
     return module;
 };
+
+function exportAce(ns) {
+    var require = function(module, callback) {
+        return _require("", module, callback);
+    };
+    require.packaged = true;
+    
+    var root = global;
+    if (ns) {
+        if (!global[ns])
+            global[ns] = {};
+        root = global[ns];
+    }
+        
+    if (root.define)
+        _define.original = root.define;
+    
+    root.define = _define;
+
+    if (root.require)
+        _require.original = root.require;
+    
+    root.require = require;
+}
+
+exportAce(ACE_NAMESPACE);
 
 })();/* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -214,7 +228,7 @@ var lookup = function(parentId, moduleName) {
  * ***** END LICENSE BLOCK ***** */
 
 
-define('kitchen-sink/demo', ['require', 'exports', 'module' , 'ace/lib/fixoldbrowsers', 'ace/lib/net', 'ace/lib/event', 'ace/theme/textmate', 'ace/edit_session', 'ace/undomanager', 'ace/keyboard/keybinding/vim', 'ace/keyboard/keybinding/emacs', 'ace/keyboard/hash_handler', 'ace/mode/c_cpp', 'ace/mode/clojure', 'ace/mode/coffee', 'ace/mode/coldfusion', 'ace/mode/csharp', 'ace/mode/css', 'ace/mode/groovy', 'ace/mode/haxe', 'ace/mode/html', 'ace/mode/java', 'ace/mode/javascript', 'ace/mode/json', 'ace/mode/latex', 'ace/mode/lua', 'ace/mode/markdown', 'ace/mode/ocaml', 'ace/mode/perl', 'ace/mode/php', 'ace/mode/powershell', 'ace/mode/python', 'ace/mode/scala', 'ace/mode/scss', 'ace/mode/ruby', 'ace/mode/sql', 'ace/mode/SVG', 'ace/mode/text', 'ace/mode/textile', 'ace/mode/xml', 'text!kitchen-sink/docs/plaintext.txt', 'text!kitchen-sink/docs/javascript.js', 'text!kitchen-sink/docs/coffeescript.coffee', 'text!kitchen-sink/docs/json.json', 'text!kitchen-sink/docs/css.css', 'text!kitchen-sink/docs/scss.scss', 'text!kitchen-sink/docs/html.html', 'text!kitchen-sink/docs/xml.xml', 'text!kitchen-sink/docs/svg.svg', 'text!kitchen-sink/docs/php.php', 'text!kitchen-sink/docs/coldfusion.cfm', 'text!kitchen-sink/docs/python.py', 'text!kitchen-sink/docs/ruby.rb', 'text!kitchen-sink/docs/perl.pl', 'text!kitchen-sink/docs/ocaml.ml', 'text!kitchen-sink/docs/lua.lua', 'text!kitchen-sink/docs/java.java', 'text!kitchen-sink/docs/clojure.clj', 'text!kitchen-sink/docs/groovy.groovy', 'text!kitchen-sink/docs/scala.scala', 'text!kitchen-sink/docs/csharp.cs', 'text!kitchen-sink/docs/powershell.ps1', 'text!kitchen-sink/docs/cpp.cpp', 'text!kitchen-sink/docs/Haxe.hx', 'text!kitchen-sink/docs/markdown.md', 'text!kitchen-sink/docs/textile.textile', 'text!kitchen-sink/docs/latex.tex', 'ace/split'], function(require, exports, module) {
+define('kitchen-sink/demo', ['require', 'exports', 'module' , 'ace/lib/fixoldbrowsers', 'ace/lib/net', 'ace/lib/event', 'ace/theme/textmate', 'ace/edit_session', 'ace/undomanager', 'ace/keyboard/keybinding/vim', 'ace/keyboard/keybinding/emacs', 'ace/keyboard/hash_handler', 'ace/mode/c_cpp', 'ace/mode/clojure', 'ace/mode/coffee', 'ace/mode/coldfusion', 'ace/mode/csharp', 'ace/mode/css', 'ace/mode/groovy', 'ace/mode/haxe', 'ace/mode/html', 'ace/mode/java', 'ace/mode/javascript', 'ace/mode/json', 'ace/mode/latex', 'ace/mode/lua', 'ace/mode/markdown', 'ace/mode/ocaml', 'ace/mode/perl', 'ace/mode/pgsql', 'ace/mode/php', 'ace/mode/powershell', 'ace/mode/python', 'ace/mode/scala', 'ace/mode/scss', 'ace/mode/ruby', 'ace/mode/sql', 'ace/mode/SVG', 'ace/mode/text', 'ace/mode/textile', 'ace/mode/xml', 'text!kitchen-sink/docs/plaintext.txt', 'text!kitchen-sink/docs/javascript.js', 'text!kitchen-sink/docs/coffeescript.coffee', 'text!kitchen-sink/docs/json.json', 'text!kitchen-sink/docs/css.css', 'text!kitchen-sink/docs/scss.scss', 'text!kitchen-sink/docs/html.html', 'text!kitchen-sink/docs/xml.xml', 'text!kitchen-sink/docs/svg.svg', 'text!kitchen-sink/docs/php.php', 'text!kitchen-sink/docs/coldfusion.cfm', 'text!kitchen-sink/docs/python.py', 'text!kitchen-sink/docs/ruby.rb', 'text!kitchen-sink/docs/perl.pl', 'text!kitchen-sink/docs/ocaml.ml', 'text!kitchen-sink/docs/lua.lua', 'text!kitchen-sink/docs/java.java', 'text!kitchen-sink/docs/clojure.clj', 'text!kitchen-sink/docs/groovy.groovy', 'text!kitchen-sink/docs/scala.scala', 'text!kitchen-sink/docs/csharp.cs', 'text!kitchen-sink/docs/powershell.ps1', 'text!kitchen-sink/docs/cpp.cpp', 'text!kitchen-sink/docs/Haxe.hx', 'text!kitchen-sink/docs/markdown.md', 'text!kitchen-sink/docs/textile.textile', 'text!kitchen-sink/docs/latex.tex', 'text!kitchen-sink/docs/sql.sql', 'text!kitchen-sink/docs/pgsql.pgsql', 'ace/split'], function(require, exports, module) {
 
 require("ace/lib/fixoldbrowsers");
 var env = {};
@@ -268,7 +282,7 @@ function loadTheme(name, callback) {
         
     themes[name] = 1;
     var base = name.split("/").pop();
-    var fileName = "src/theme-" + base + ".js";
+    var fileName = "demo/kitchen-sink/theme-" + base + "-uncompressed.js";
     net.loadScript(fileName, callback);
 }
 
@@ -287,9 +301,10 @@ var modes = [
     new Mode("json", "JSON", require("ace/mode/json").Mode, ["json"]),
     new Mode("latex", "LaTeX", require("ace/mode/latex").Mode, ["tex"]),
     new Mode("lua", "Lua", require("ace/mode/lua").Mode, ["lua"]),
-    new Mode("markdown", "MarkDown", require("ace/mode/markdown").Mode, ["md", "markdown"]),
+    new Mode("markdown", "Markdown", require("ace/mode/markdown").Mode, ["md", "markdown"]),
     new Mode("ocaml", "OCaml", require("ace/mode/ocaml").Mode, ["ml", "mli"]),
     new Mode("perl", "Perl", require("ace/mode/perl").Mode, ["pl", "pm"]),
+    new Mode("pgsql", "pgSQL",require("ace/mode/pgsql").Mode, ["pgsql", "sql"]),
     new Mode("php", "PHP",require("ace/mode/php").Mode, ["php"]),
     new Mode("powershell", "Powershell", require("ace/mode/powershell").Mode, ["ps1"]),
     new Mode("python", "Python", require("ace/mode/python").Mode, ["py"]),
@@ -418,6 +433,14 @@ var docs = [
     new WrappedDoc(
         "latex", "LaTeX",
         require("text!./docs/latex.tex")
+    ),
+    new WrappedDoc(
+        "sql", "SQL",
+        require("text!./docs/sql.sql")
+    ),
+    new WrappedDoc(
+        "pgsql", "pgSQL",
+        require("text!./docs/pgsql.pgsql")
     )
 ];
 
@@ -526,7 +549,7 @@ bindDropdown("mode", function(value) {
 });
 
 bindDropdown("theme", function(value) {
-    if (window.require.packaged) {
+    if (module.packaged) {
         loadTheme(value, function() {
             env.editor.setTheme(value);
         });
@@ -546,6 +569,7 @@ bindDropdown("fontsize", function(value) {
 
 bindDropdown("folding", function(value) {
     env.editor.getSession().setFoldStyle(value);
+    env.editor.setShowFoldWidgets(value !== "manual");
 });
 
 bindDropdown("soft_wrap", function(value) {
@@ -753,20 +777,24 @@ commands.addCommand({
 */
 
 define('ace/lib/fixoldbrowsers', ['require', 'exports', 'module' , 'ace/lib/regexp', 'ace/lib/es5-shim'], function(require, exports, module) {
+"use strict";
 
 require("./regexp");
 require("./es5-shim");
 
-});define('ace/lib/regexp', ['require', 'exports', 'module' ], function(require, exports, module) {
-
-// Based on code from:
-//
-// XRegExp 1.5.0
-// (c) 2007-2010 Steven Levithan
-// MIT License
-// <http://xregexp.com>
-// Provides an augmented, extensible, cross-browser implementation of regular expressions,
-// including support for additional syntax, flags, and methods
+});/**
+ *  Based on code from:
+ *
+ * XRegExp 1.5.0
+ * (c) 2007-2010 Steven Levithan
+ * MIT License
+ * <http://xregexp.com>
+ * Provides an augmented, extensible, cross-browser implementation of regular expressions,
+ * including support for additional syntax, flags, and methods
+ */
+ 
+define('ace/lib/regexp', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
     //---------------------------------
     //  Private variables
@@ -1921,8 +1949,7 @@ var prepareString = "a"[0] != "a",
         }
         return Object(o);
     };
-});
-/**
+});/**
  * based on code from:
  * 
  * @license RequireJS text 0.25.0 Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
@@ -1930,7 +1957,8 @@ var prepareString = "a"[0] != "a",
  * see: http://github.com/jrburke/requirejs for details
  */
 define('ace/lib/net', ['require', 'exports', 'module' ], function(require, exports, module) {
-    
+"use strict";
+
 exports.get = function (url, callback) {
     var xhr = exports.createXhr();
     xhr.open('GET', url, true);
@@ -1946,7 +1974,7 @@ exports.get = function (url, callback) {
 
 var progIds = ['Msxml2.XMLHTTP', 'Microsoft.XMLHTTP', 'Msxml2.XMLHTTP.4.0'];
 
-exports.createXhr = function () {
+exports.createXhr = function() {
     //Would love to dump the ActiveX crap in here. Need IE 6 to die first.
     var xhr, i, progId;
     if (typeof XMLHttpRequest !== "undefined") {
@@ -2020,6 +2048,7 @@ exports.loadScript = function(path, callback) {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/lib/event', ['require', 'exports', 'module' , 'ace/lib/keys', 'ace/lib/useragent', 'ace/lib/dom'], function(require, exports, module) {
+"use strict";
 
 var keys = require("./keys");
 var useragent = require("./useragent");
@@ -2269,7 +2298,7 @@ function normalizeCommandKeys(callback, e, keyCode) {
 
 exports.addCommandKeyListener = function(el, callback) {
     var addListener = exports.addListener;
-    if (useragent.isOldGecko) {
+    if (useragent.isOldGecko || useragent.isOpera) {
         // Old versions of Gecko aka. Firefox < 4.0 didn't repeat the keydown
         // event if the user pressed the key for a longer time. Instead, the
         // keydown event was fired once and later on only the keypress event.
@@ -2290,18 +2319,6 @@ exports.addCommandKeyListener = function(el, callback) {
             lastDown = e.keyIdentifier || e.keyCode;
             return normalizeCommandKeys(callback, e, e.keyCode);
         });
-
-        // repeated keys are fired as keypress and not keydown events
-        if (useragent.isMac && useragent.isOpera) {
-            addListener(el, "keypress", function(e) {
-                var keyId = e.keyIdentifier || e.keyCode;
-                if (lastDown !== keyId) {
-                    return normalizeCommandKeys(callback, e, lastDown);
-                } else {
-                    lastDown = null;
-                }
-            });
-        }
     }
 };
 
@@ -2362,6 +2379,7 @@ For more information about SproutCore, visit http://www.sproutcore.com
 // Most of the following code is taken from SproutCore with a few changes.
 
 define('ace/lib/keys', ['require', 'exports', 'module' , 'ace/lib/oop'], function(require, exports, module) {
+"use strict";
 
 var oop = require("./oop");
 
@@ -2493,6 +2511,7 @@ exports.keyCodeToString = function(keyCode) {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/lib/oop', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 exports.inherits = (function() {
     var tempCtor = function() {};
@@ -2501,7 +2520,7 @@ exports.inherits = (function() {
         ctor.super_ = superCtor.prototype;
         ctor.prototype = new tempCtor();
         ctor.prototype.constructor = ctor;
-    }
+    };
 }());
 
 exports.mixin = function(obj, mixin) {
@@ -2553,10 +2572,10 @@ exports.implement = function(proto, mixin) {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/lib/useragent', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 var os = (navigator.platform.match(/mac|win|linux/i) || ["other"])[0].toLowerCase();
 var ua = navigator.userAgent;
-var av = navigator.appVersion;
 
 /** Is the user using a browser that identifies itself as Windows */
 exports.isWin = (os == "win");
@@ -2577,7 +2596,7 @@ exports.isOldIE = exports.isIE && exports.isIE < 9;
 exports.isGecko = exports.isMozilla = window.controllers && window.navigator.product === "Gecko";
 
 /** oldGecko == rev < 2.0 **/
-exports.isOldGecko = exports.isGecko && parseInt((navigator.userAgent.match(/rv\:(\d+)/)||[])[1]) < 4;
+exports.isOldGecko = exports.isGecko && parseInt((navigator.userAgent.match(/rv\:(\d+)/)||[])[1], 10) < 4;
 
 /** Is this Opera */
 exports.isOpera = window.opera && Object.prototype.toString.call(window.opera) == "[object Opera]";
@@ -2601,9 +2620,9 @@ exports.isTouchPad = ua.indexOf("TouchPad") >= 0;
  * Windows folks expect to use CTRL + C
  */
 exports.OS = {
-    LINUX: 'LINUX',
-    MAC: 'MAC',
-    WINDOWS: 'WINDOWS'
+    LINUX: "LINUX",
+    MAC: "MAC",
+    WINDOWS: "WINDOWS"
 };
 
 /**
@@ -2611,11 +2630,11 @@ exports.OS = {
  */
 exports.getOS = function() {
     if (exports.isMac) {
-        return exports.OS['MAC'];
+        return exports.OS.MAC;
     } else if (exports.isLinux) {
-        return exports.OS['LINUX'];
+        return exports.OS.LINUX;
     } else {
-        return exports.OS['WINDOWS'];
+        return exports.OS.WINDOWS;
     }
 };
 
@@ -2661,6 +2680,7 @@ exports.getOS = function() {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/lib/dom', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 var XHTML_NS = "http://www.w3.org/1999/xhtml";
 
@@ -2679,69 +2699,51 @@ exports.setText = function(elem, text) {
     }
 };
 
-if (!document.documentElement.classList) {
-    exports.hasCssClass = function(el, name) {
-        var classes = el.className.split(/\s+/g);
-        return classes.indexOf(name) !== -1;
-    };
+exports.hasCssClass = function(el, name) {
+    var classes = el.className.split(/\s+/g);
+    return classes.indexOf(name) !== -1;
+};
 
-    /**
-    * Add a CSS class to the list of classes on the given node
-    */
-    exports.addCssClass = function(el, name) {
-        if (!exports.hasCssClass(el, name)) {
-            el.className += " " + name;
+/**
+* Add a CSS class to the list of classes on the given node
+*/
+exports.addCssClass = function(el, name) {
+    if (!exports.hasCssClass(el, name)) {
+        el.className += " " + name;
+    }
+};
+
+/**
+* Remove a CSS class from the list of classes on the given node
+*/
+exports.removeCssClass = function(el, name) {
+    var classes = el.className.split(/\s+/g);
+    while (true) {
+        var index = classes.indexOf(name);
+        if (index == -1) {
+            break;
         }
-    };
+        classes.splice(index, 1);
+    }
+    el.className = classes.join(" ");
+};
 
-    /**
-    * Remove a CSS class from the list of classes on the given node
-    */
-    exports.removeCssClass = function(el, name) {
-        var classes = el.className.split(/\s+/g);
-        while (true) {
-            var index = classes.indexOf(name);
-            if (index == -1) {
-                break;
-            }
-            classes.splice(index, 1);
+exports.toggleCssClass = function(el, name) {
+    var classes = el.className.split(/\s+/g), add = true;
+    while (true) {
+        var index = classes.indexOf(name);
+        if (index == -1) {
+            break;
         }
-        el.className = classes.join(" ");
-    };
+        add = false;
+        classes.splice(index, 1);
+    }
+    if(add)
+        classes.push(name);
 
-    exports.toggleCssClass = function(el, name) {
-        var classes = el.className.split(/\s+/g), add = true;
-        while (true) {
-            var index = classes.indexOf(name);
-            if (index == -1) {
-                break;
-            }
-            add = false;
-            classes.splice(index, 1);
-        }
-        if(add)
-            classes.push(name);
-
-        el.className = classes.join(" ");
-        return add;
-    };
-} else {
-    exports.hasCssClass = function(el, name) {
-        return el.classList.contains(name);
-    };
-
-    exports.addCssClass = function(el, name) {
-        el.classList.add(name);
-    };
-
-    exports.removeCssClass = function(el, name) {
-        el.classList.remove(name);
-    };
-
-    exports.toggleCssClass = function(el, name) {
-        return el.classList.toggle(name);
-    };
-}
+    el.className = classes.join(" ");
+    return add;
+};
 
 /**
  * Add or remove a CSS class from the list of classes on the given node
@@ -2784,9 +2786,9 @@ exports.importCssString = function importCssString(cssText, id, doc) {
         if (id)
             style.title = id;
     } else {
-        style = doc.createElementNS ?
-                    doc.createElementNS(XHTML_NS, "style") :
-                    doc.createElement("style");
+        style = doc.createElementNS
+            ? doc.createElementNS(XHTML_NS, "style")
+            : doc.createElement("style");
 
         style.appendChild(doc.createTextNode(cssText));
         if (id)
@@ -2967,6 +2969,8 @@ exports.getParentWindow = function(document) {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/theme/textmate', ['require', 'exports', 'module' , 'ace/lib/dom'], function(require, exports, module) {
+"use strict";
+
 exports.isDark = false;
 exports.cssClass = "ace-tm";
 exports.cssText = ".ace-tm .ace_editor {\
@@ -2978,24 +2982,17 @@ exports.cssText = ".ace-tm .ace_editor {\
 }\
 \
 .ace-tm .ace_gutter {\
-  width: 50px;\
   background: #e8e8e8;\
   color: #333;\
-  overflow : hidden;\
-}\
-\
-.ace-tm .ace_gutter-layer {\
-  width: 100%;\
-  text-align: right;\
-}\
-\
-.ace-tm .ace_gutter-layer .ace_gutter-cell {\
-  padding-right: 6px;\
 }\
 \
 .ace-tm .ace_print_margin {\
   width: 1px;\
   background: #e8e8e8;\
+}\
+\
+.ace-tm .ace_fold {\
+    background-color: #0000A2;\
 }\
 \
 .ace-tm .ace_text-layer {\
@@ -3034,10 +3031,6 @@ exports.cssText = ".ace-tm .ace_editor {\
 .ace-tm .ace_line .ace_invalid {\
   background-color: rgb(153, 0, 0);\
   color: white;\
-}\
-\
-.ace-tm .ace_line .ace_fold {\
-    outline-color: #1C00FF;\
 }\
 \
 .ace-tm .ace_line .ace_support.ace_function {\
@@ -3135,8 +3128,8 @@ exports.cssText = ".ace-tm .ace_editor {\
   color: rgb(255, 0, 0)\
 }";
 
-    var dom = require("../lib/dom");
-    dom.importCssString(exports.cssText);
+var dom = require("../lib/dom");
+dom.importCssString(exports.cssText, exports.cssClass);
 });
 /* vim:ts=4:sts=4:sw=4:
  * ***** BEGIN LICENSE BLOCK *****
@@ -3179,6 +3172,7 @@ exports.cssText = ".ace-tm .ace_editor {\
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/edit_session', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/lib/event_emitter', 'ace/selection', 'ace/mode/text', 'ace/range', 'ace/document', 'ace/background_tokenizer', 'ace/edit_session/folding', 'ace/edit_session/bracket_match'], function(require, exports, module) {
+"use strict";
 
 var oop = require("./lib/oop");
 var lang = require("./lib/lang");
@@ -3282,7 +3276,7 @@ var EditSession = function(text, mode) {
         }
 
         this.bgTokenizer.start(delta.range.start.row);
-        this._dispatchEvent("change", e);
+        this._emit("change", e);
     };
 
     this.setValue = function(text) {
@@ -3415,7 +3409,7 @@ var EditSession = function(text, mode) {
 
         this.$modified = true;
         this.$tabSize = tabSize;
-        this._dispatchEvent("changeTabSize");
+        this._emit("changeTabSize");
     };
 
     this.getTabSize = function() {
@@ -3431,7 +3425,7 @@ var EditSession = function(text, mode) {
         if (this.$overwrite == overwrite) return;
 
         this.$overwrite = overwrite;
-        this._dispatchEvent("changeOverwrite");
+        this._emit("changeOverwrite");
     };
 
     this.getOverwrite = function() {
@@ -3451,22 +3445,22 @@ var EditSession = function(text, mode) {
         for (var i=0; i<rows.length; i++) {
             this.$breakpoints[rows[i]] = true;
         }
-        this._dispatchEvent("changeBreakpoint", {});
+        this._emit("changeBreakpoint", {});
     };
 
     this.clearBreakpoints = function() {
         this.$breakpoints = [];
-        this._dispatchEvent("changeBreakpoint", {});
+        this._emit("changeBreakpoint", {});
     };
 
     this.setBreakpoint = function(row) {
         this.$breakpoints[row] = true;
-        this._dispatchEvent("changeBreakpoint", {});
+        this._emit("changeBreakpoint", {});
     };
 
     this.clearBreakpoint = function(row) {
         delete this.$breakpoints[row];
-        this._dispatchEvent("changeBreakpoint", {});
+        this._emit("changeBreakpoint", {});
     };
 
     this.getBreakpoints = function() {
@@ -3486,10 +3480,10 @@ var EditSession = function(text, mode) {
 
         if (inFront) {
             this.$frontMarkers[id] = marker;
-            this._dispatchEvent("changeFrontMarker")
+            this._emit("changeFrontMarker")
         } else {
             this.$backMarkers[id] = marker;
-            this._dispatchEvent("changeBackMarker")
+            this._emit("changeBackMarker")
         }
 
         return id;
@@ -3503,7 +3497,7 @@ var EditSession = function(text, mode) {
         var markers = marker.inFront ? this.$frontMarkers : this.$backMarkers;
         if (marker) {
             delete (markers[markerId]);
-            this._dispatchEvent(marker.inFront ? "changeFrontMarker" : "changeBackMarker");
+            this._emit(marker.inFront ? "changeFrontMarker" : "changeBackMarker");
         }
     };
 
@@ -3530,7 +3524,7 @@ var EditSession = function(text, mode) {
             else
                 this.$annotations[row] = [annotation];
         }
-        this._dispatchEvent("changeAnnotation", {});
+        this._emit("changeAnnotation", {});
     };
 
     this.getAnnotations = function() {
@@ -3539,7 +3533,7 @@ var EditSession = function(text, mode) {
 
     this.clearAnnotations = function() {
         this.$annotations = {};
-        this._dispatchEvent("changeAnnotation", {});
+        this._emit("changeAnnotation", {});
     };
 
     this.$detectNewLine = function(text) {
@@ -3620,7 +3614,7 @@ var EditSession = function(text, mode) {
     this.onReloadTokenizer = function(e) {
         var rows = e.data;
         this.bgTokenizer.start(rows.first);
-        this._dispatchEvent("tokenizerUpdate", e);
+        this._emit("tokenizerUpdate", e);
     };
 
     this.$mode = null;
@@ -3644,7 +3638,7 @@ var EditSession = function(text, mode) {
             this.bgTokenizer = new BackgroundTokenizer(tokenizer);
             var _self = this;
             this.bgTokenizer.addEventListener("update", function(e) {
-                _self._dispatchEvent("tokenizerUpdate", e);
+                _self._emit("tokenizerUpdate", e);
             });
         } else {
             this.bgTokenizer.setTokenizer(tokenizer);
@@ -3658,7 +3652,7 @@ var EditSession = function(text, mode) {
 
         this.$setFolding(mode.foldingRules);
 
-        this._dispatchEvent("changeMode");
+        this._emit("changeMode");
     };
 
     this.$stopWorker = function() {
@@ -3685,17 +3679,33 @@ var EditSession = function(text, mode) {
     this.getMode = function() {
         return this.$mode;
     };
-
+    
     this.$scrollTop = 0;
-    this.setScrollTopRow = function(scrollTopRow) {
-        if (this.$scrollTop === scrollTopRow) return;
+    this.setScrollTop = function(scrollTop) {
+        scrollTop = Math.round(Math.max(0, scrollTop));
+        if (this.$scrollTop === scrollTop)
+            return;
 
-        this.$scrollTop = scrollTopRow;
-        this._dispatchEvent("changeScrollTop");
+        this.$scrollTop = scrollTop;
+        this._emit("changeScrollTop", scrollTop);
     };
 
-    this.getScrollTopRow = function() {
+    this.getScrollTop = function() {
         return this.$scrollTop;
+    };
+    
+    this.$scrollLeft = 0;
+    this.setScrollLeft = function(scrollLeft) {
+        scrollLeft = Math.round(Math.max(0, scrollLeft));
+        if (this.$scrollLeft === scrollLeft)
+            return;
+
+        this.$scrollLeft = scrollLeft;
+        this._emit("changeScrollLeft", scrollLeft);
+    };
+
+    this.getScrollLeft = function() {
+        return this.$scrollLeft;
     };
 
     this.getWidth = function() {
@@ -4060,7 +4070,7 @@ var EditSession = function(text, mode) {
                 this.$updateWrapData(0, len - 1);
             }
 
-            this._dispatchEvent("changeWrapMode");
+            this._emit("changeWrapMode");
         }
     };
 
@@ -4078,7 +4088,7 @@ var EditSession = function(text, mode) {
             this.$wrapLimitRange.max = max;
             this.$modified = true;
             // This will force a recalculation of the wrap limit
-            this._dispatchEvent("changeWrapMode");
+            this._emit("changeWrapMode");
         }
     };
 
@@ -4092,7 +4102,7 @@ var EditSession = function(text, mode) {
             if (this.$useWrapMode) {
                 this.$updateWrapData(0, this.getLength() - 1);
                 this.$resetRowCache(0)
-                this._dispatchEvent("changeWrapLimit");
+                this._emit("changeWrapLimit");
             }
             return true;
         }
@@ -4874,6 +4884,7 @@ exports.EditSession = EditSession;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/lib/lang', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 exports.stringReverse = function(string) {
     return string.split("").reverse().join("");
@@ -5026,6 +5037,7 @@ exports.deferredCall = function(fcn) {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/lib/event_emitter', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 var EventEmitter = {};
 
@@ -5143,6 +5155,7 @@ exports.EventEmitter = EventEmitter;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/selection', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/lib/event_emitter', 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var oop = require("./lib/oop");
 var lang = require("./lib/lang");
@@ -5166,16 +5179,16 @@ var Selection = function(session) {
 
     var _self = this;
     this.selectionLead.on("change", function(e) {
-        _self._dispatchEvent("changeCursor");
+        _self._emit("changeCursor");
         if (!_self.$isEmpty)
-            _self._dispatchEvent("changeSelection");
+            _self._emit("changeSelection");
         if (!_self.$preventUpdateDesiredColumnOnChange && e.old.column != e.value.column)
             _self.$updateDesiredColumn();
     });
 
     this.selectionAnchor.on("change", function() {
         if (!_self.$isEmpty)
-            _self._dispatchEvent("changeSelection");
+            _self._emit("changeSelection");
     });
 };
 
@@ -5207,7 +5220,7 @@ var Selection = function(session) {
 
         if (this.$isEmpty) {
             this.$isEmpty = false;
-            this._dispatchEvent("changeSelection");
+            this._emit("changeSelection");
         }
     };
 
@@ -5267,7 +5280,7 @@ var Selection = function(session) {
     this.clearSelection = function() {
         if (!this.$isEmpty) {
             this.$isEmpty = true;
-            this._dispatchEvent("changeSelection");
+            this._emit("changeSelection");
         }
     };
 
@@ -5651,6 +5664,7 @@ exports.Selection = Selection;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/range', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 var Range = function(startRow, startColumn, endRow, endColumn) {
     this.start = {
@@ -5971,6 +5985,7 @@ exports.Range = Range;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/text', ['require', 'exports', 'module' , 'ace/tokenizer', 'ace/mode/text_highlight_rules', 'ace/mode/behaviour', 'ace/unicode'], function(require, exports, module) {
+"use strict";
 
 var Tokenizer = require("../tokenizer").Tokenizer;
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
@@ -6188,6 +6203,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/tokenizer', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 var Tokenizer = function(rules, flag) {
     flag = flag ? "g" + flag : "g";
@@ -6354,6 +6370,7 @@ exports.Tokenizer = Tokenizer;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/text_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/lang'], function(require, exports, module) {
+"use strict";
 
 var lang = require("../lib/lang");
 
@@ -6465,6 +6482,7 @@ exports.TextHighlightRules = TextHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/behaviour', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 var Behaviour = function() {
    this.$behaviours = {};
@@ -6523,6 +6541,7 @@ var Behaviour = function() {
 
 exports.Behaviour = Behaviour;
 });define('ace/unicode', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 /*
 XRegExp Unicode plugin pack: Categories 1.0
@@ -6665,6 +6684,7 @@ function addUnicodePackage (pack) {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/document', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/event_emitter', 'ace/range', 'ace/anchor'], function(require, exports, module) {
+"use strict";
 
 var oop = require("./lib/oop");
 var EventEmitter = require("./lib/event_emitter").EventEmitter;
@@ -6836,7 +6856,7 @@ var Document = function(text) {
             range: range,
             lines: lines
         };
-        this._dispatchEvent("change", { data: delta });
+        this._emit("change", { data: delta });
         return range.end;
     };
 
@@ -6857,7 +6877,7 @@ var Document = function(text) {
             range: Range.fromPoints(position, end),
             text: this.getNewLineCharacter()
         };
-        this._dispatchEvent("change", { data: delta });
+        this._emit("change", { data: delta });
 
         return end;
     };
@@ -6881,7 +6901,7 @@ var Document = function(text) {
             range: Range.fromPoints(position, end),
             text: text
         };
-        this._dispatchEvent("change", { data: delta });
+        this._emit("change", { data: delta });
 
         return end;
     };
@@ -6933,7 +6953,7 @@ var Document = function(text) {
             range: range,
             text: removed
         };
-        this._dispatchEvent("change", { data: delta });
+        this._emit("change", { data: delta });
         return range.start;
     };
 
@@ -6954,7 +6974,7 @@ var Document = function(text) {
             nl: this.getNewLineCharacter(),
             lines: removed
         };
-        this._dispatchEvent("change", { data: delta });
+        this._emit("change", { data: delta });
         return removed;
     };
 
@@ -6972,7 +6992,7 @@ var Document = function(text) {
             range: range,
             text: this.getNewLineCharacter()
         };
-        this._dispatchEvent("change", { data: delta });
+        this._emit("change", { data: delta });
     };
 
     this.replace = function(range, text) {
@@ -7070,6 +7090,7 @@ exports.Document = Document;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/anchor', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/event_emitter'], function(require, exports, module) {
+"use strict";
 
 var oop = require("./lib/oop");
 var EventEmitter = require("./lib/event_emitter").EventEmitter;
@@ -7189,7 +7210,7 @@ var Anchor = exports.Anchor = function(doc, row, column) {
         
         this.row = pos.row;
         this.column = pos.column;
-        this._dispatchEvent("change", {
+        this._emit("change", {
             old: old,
             value: pos
         });
@@ -7262,6 +7283,7 @@ var Anchor = exports.Anchor = function(doc, row, column) {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/background_tokenizer', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/event_emitter'], function(require, exports, module) {
+"use strict";
 
 var oop = require("./lib/oop");
 var EventEmitter = require("./lib/event_emitter").EventEmitter;
@@ -7326,7 +7348,7 @@ var BackgroundTokenizer = function(tokenizer, editor) {
             first: firstRow,
             last: lastRow
         };
-        this._dispatchEvent("update", {data: data});
+        this._emit("update", {data: data});
     };
 
     this.start = function(startRow) {
@@ -7356,8 +7378,8 @@ var BackgroundTokenizer = function(tokenizer, editor) {
     };
 
     this.$tokenizeRows = function(firstRow, lastRow) {
-        if (!this.doc)
-            return [];
+        if (!this.doc || isNaN(firstRow) || isNaN(lastRow))
+            return [{'state':'start','tokens':[]}];
             
         var rows = [];
 
@@ -7438,6 +7460,7 @@ exports.BackgroundTokenizer = BackgroundTokenizer;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/edit_session/folding', ['require', 'exports', 'module' , 'ace/range', 'ace/edit_session/fold_line', 'ace/edit_session/fold', 'ace/token_iterator'], function(require, exports, module) {
+"use strict";
 
 var Range = require("../range").Range;
 var FoldLine = require("./fold_line").FoldLine;
@@ -7743,7 +7766,7 @@ function Folding() {
 
         // Notify that fold data has changed.
         this.$modified = true;
-        this._dispatchEvent("changeFold", { data: fold });
+        this._emit("changeFold", { data: fold });
 
         return fold;
     };
@@ -7759,8 +7782,8 @@ function Folding() {
         var startRow = foldLine.start.row;
         var endRow = foldLine.end.row;
 
-        var foldLines = this.$foldData,
-            folds = foldLine.folds;
+        var foldLines = this.$foldData;
+        var folds = foldLine.folds;
         // Simple case where there is only one fold in the FoldLine such that
         // the entire fold line can get removed directly.
         if (folds.length == 1) {
@@ -7801,7 +7824,7 @@ function Folding() {
 
         // Notify that fold data has changed.
         this.$modified = true;
-        this._dispatchEvent("changeFold", { data: fold });
+        this._emit("changeFold", { data: fold });
     };
 
     this.removeFolds = function(folds) {
@@ -7868,8 +7891,8 @@ function Folding() {
     this.getRowFoldEnd = function(docRow, startFoldRow) {
         var foldLine = this.getFoldLine(docRow, startFoldRow);
         return (foldLine
-                    ? foldLine.end.row
-                    : docRow)
+            ? foldLine.end.row
+            : docRow);
     };
 
     this.getFoldDisplayLine = function(foldLine, endRow, endColumn, startRow, startColumn) {
@@ -7887,7 +7910,7 @@ function Folding() {
         var doc = this.doc;
         var textLine = "";
 
-        foldLine.walk(function(placeholder, row, column, lastColumn, isNewRow) {
+        foldLine.walk(function(placeholder, row, column, lastColumn) {
             if (row < startRow) {
                 return;
             } else if (row == startRow) {
@@ -7933,31 +7956,36 @@ function Folding() {
     this.toggleFold = function(tryToUnfold) {
         var selection = this.selection;
         var range = selection.getRange();
+        var fold;
+        var bracketPos;
 
         if (range.isEmpty()) {
             var cursor = range.start;
-            var fold = this.getFoldAt(cursor.row, cursor.column);
-            var bracketPos;
+            fold = this.getFoldAt(cursor.row, cursor.column);
 
             if (fold) {
                 this.expandFold(fold);
                 return;
-            } else if (bracketPos = this.findMatchingBracket(cursor)) {
+            }
+            else if (bracketPos = this.findMatchingBracket(cursor)) {
                 if (range.comparePoint(bracketPos) == 1) {
                     range.end = bracketPos;
-                } else {
+                } 
+                else {
                     range.start = bracketPos;
                     range.start.column++;
                     range.end.column--;
                 }
-            } else if (bracketPos = this.findMatchingBracket({row: cursor.row, column: cursor.column + 1})) {
+            }
+            else if (bracketPos = this.findMatchingBracket({row: cursor.row, column: cursor.column + 1})) {
                 if (range.comparePoint(bracketPos) == 1)
                     range.end = bracketPos;
                 else
                     range.start = bracketPos;
 
                 range.start.column++;
-            } else {
+            }
+            else {
                 range = this.getCommentFoldRange(cursor.row, cursor.column) || range;
             }
         } else {
@@ -7965,7 +7993,8 @@ function Folding() {
             if (tryToUnfold && folds.length) {
                 this.expandFolds(folds);
                 return;
-            } else if (folds.length == 1 ) {
+            } 
+            else if (folds.length == 1 ) {
                 fold = folds[0];
             }
         }
@@ -7973,7 +8002,7 @@ function Folding() {
         if (!fold)
             fold = this.getFoldAt(range.start.row, range.start.column);
 
-        if (fold && fold.range.toString() == range.toString()){
+        if (fold && fold.range.toString() == range.toString()) {
             this.expandFold(fold);
             return;
         }
@@ -8019,7 +8048,7 @@ function Folding() {
 
     this.foldAll = function(startRow, endRow) {
         var foldWidgets = this.foldWidgets;
-        endRow = endRow || foldWidgets.length;
+        endRow = endRow || this.getLength();
         for (var row = startRow || 0; row < endRow; row++) {
             if (foldWidgets[row] == null)
                 foldWidgets[row] = this.getFoldWidget(row);
@@ -8049,6 +8078,9 @@ function Folding() {
             return;
 
         this.$foldStyle = style;
+        
+        if (style == "manual")
+            this.unfold();
         
         // reset folding
         var mode = this.$foldMode;
@@ -8102,11 +8134,24 @@ function Folding() {
 
         var range = this.getFoldWidgetRange(row);
         if (range) {
+            // sometimes singleline folds can be missed by the code above
+            if (!range.isMultiLine()) {
+                fold = this.getFoldAt(range.start.row, range.start.column, 1);
+                if (fold && range.isEequal(fold.range)) {
+                    this.removeFold(fold);
+                    return;
+                }
+            }
+            
             if (!onlySubfolds)
                 this.addFold("...", range);
 
             if (addSubfolds)
                 this.foldAll(range.start.row + 1, range.end.row);
+        } else {
+            if (addSubfolds)
+                this.foldAll(row + 1, this.getLength());
+            e.target.className += " invalid"
         }
     };
     
@@ -8171,6 +8216,7 @@ exports.Folding = Folding;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/edit_session/fold_line', ['require', 'exports', 'module' , 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var Range = require("../range").Range;
 
@@ -8443,6 +8489,7 @@ exports.FoldLine = FoldLine;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/edit_session/fold', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 /**
  * Simple fold-data struct.
@@ -8557,6 +8604,7 @@ var Fold = exports.Fold = function(range, placeholder) {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/token_iterator', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 var TokenIterator = function(session, initialRow, initialColumn) {
     this.$session = session;
@@ -8673,6 +8721,7 @@ exports.TokenIterator = TokenIterator;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/edit_session/bracket_match', ['require', 'exports', 'module' , 'ace/token_iterator'], function(require, exports, module) {
+"use strict";
 
 var TokenIterator = require("../token_iterator").TokenIterator;
 
@@ -8728,15 +8777,15 @@ function BracketMatch() {
         while (true) {
         
             while (valueIndex >= 0) {
-                var char = value.charAt(valueIndex);
-                if (char == openBracket) {
+                var chr = value.charAt(valueIndex);
+                if (chr == openBracket) {
                     depth -= 1;
                     if (depth == 0) {
                         return {row: iterator.getCurrentTokenRow(),
                             column: valueIndex + iterator.getCurrentTokenColumn()};
                     }
                 }
-                else if (char == bracket) {
+                else if (chr == bracket) {
                     depth += 1;
                 }
                 valueIndex -= 1;
@@ -8782,15 +8831,15 @@ function BracketMatch() {
             var value = token.value;
             var valueLength = value.length;
             while (valueIndex < valueLength) {
-                var char = value.charAt(valueIndex);
-                if (char == closingBracket) {
+                var chr = value.charAt(valueIndex);
+                if (chr == closingBracket) {
                     depth -= 1;
                     if (depth == 0) {
                         return {row: iterator.getCurrentTokenRow(),
                             column: valueIndex + iterator.getCurrentTokenColumn()};
                     }
                 }
-                else if (char == bracket) {
+                else if (chr == bracket) {
                     depth += 1;
                 }
                 valueIndex += 1;
@@ -8854,6 +8903,7 @@ exports.BracketMatch = BracketMatch;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/undomanager', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 var UndoManager = function() {
     this.reset();
@@ -8945,6 +8995,7 @@ exports.UndoManager = UndoManager;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/keyboard/keybinding/vim', ['require', 'exports', 'module' , 'ace/keyboard/state_handler'], function(require, exports, module) {
+"use strict";
 
 var StateHandler = require("../state_handler").StateHandler;
 var matchCharacterOnly =  require("../state_handler").matchCharacterOnly;
@@ -9082,6 +9133,7 @@ exports.Vim = new StateHandler(vimStates);
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/keyboard/state_handler', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
 
 // If you're developing a new keymapping and want to get an idea what's going
 // on, then enable debugging.
@@ -9336,6 +9388,7 @@ exports.StateHandler = StateHandler;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/keyboard/keybinding/emacs', ['require', 'exports', 'module' , 'ace/keyboard/state_handler'], function(require, exports, module) {
+"use strict";
 
 var StateHandler = require("../state_handler").StateHandler;
 var matchCharacterOnly =  require("../state_handler").matchCharacterOnly;
@@ -9486,6 +9539,7 @@ exports.Emacs = new StateHandler(emacsState);
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/keyboard/hash_handler', ['require', 'exports', 'module' , 'ace/lib/keys'], function(require, exports, module) {
+"use strict";
 
 var keyUtil  = require("../lib/keys");
 
@@ -9602,6 +9656,7 @@ exports.HashHandler = HashHandler;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/c_cpp', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/c_cpp_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/range', 'ace/mode/behaviour/cstyle', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -9735,6 +9790,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/c_cpp_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -9911,6 +9967,7 @@ exports.c_cppHighlightRules = c_cppHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/doc_comment_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
@@ -10006,6 +10063,7 @@ exports.DocCommentHighlightRules = DocCommentHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/matching_brace_outdent', ['require', 'exports', 'module' , 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var Range = require("../range").Range;
 
@@ -10087,6 +10145,7 @@ exports.MatchingBraceOutdent = MatchingBraceOutdent;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/behaviour/cstyle', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/behaviour'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../../lib/oop");
 var Behaviour = require('../behaviour').Behaviour;
@@ -10307,6 +10366,7 @@ exports.CstyleBehaviour = CstyleBehaviour;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/folding/cstyle', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/range', 'ace/mode/folding/fold_mode'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../../lib/oop");
 var Range = require("../../range").Range;
@@ -10326,26 +10386,12 @@ oop.inherits(FoldMode, BaseFoldMode);
         if (match) {
             var i = match.index;
 
-            if (match[2]) {
-                var range = session.getCommentFoldRange(row, i + match[0].length);
-                range.end.column -= 2;
-                return range;
-            }
+            if (match[1])
+                return this.openingBracketBlock(session, match[1], row, i);
 
-            var start = {row: row, column: i+1};
-            var end = session.$findClosingBracket(match[1], start);
-            if (!end)
-                return;
-
-            var fw = session.foldWidgets[end.row];
-            if (fw == null)
-                fw = this.getFoldWidget(session, end.row);
-
-            if (fw == "start") {
-                end.row --;
-                end.column = session.getLine(end.row).length;
-            }
-            return Range.fromPoints(start, end);
+            var range = session.getCommentFoldRange(row, i + match[0].length);
+            range.end.column -= 2;
+            return range;
         }
 
         if (foldStyle !== "markbeginend")
@@ -10414,6 +10460,7 @@ oop.inherits(FoldMode, BaseFoldMode);
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/folding/fold_mode', ['require', 'exports', 'module' , 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var Range = require("../../range").Range;
 
@@ -10421,42 +10468,36 @@ var FoldMode = exports.FoldMode = function() {};
 
 (function() {
 
-    this.FOO = 12;
-
     this.foldingStartMarker = null;
     this.foldingStopMarker = null;
 
     // must return "" if there's no fold, to enable caching
     this.getFoldWidget = function(session, foldStyle, row) {
-        if (this.foldingStartMarker) {
-            if (this.foldingStopMarker) {
-                // rewrite getFoldWidget so the check is only performed once
-                FoldMode.prototype.getFoldWidget = this.$testBoth;
-                return this.$testBoth(session, foldStyle, row);
-            }
-            else {
-                // rewrite getFoldWidget so the check is only performed once
-                FoldMode.prototype.getFoldWidget = this.$testStart;
-                return this.$testStart(session, foldStyle, row);
-            }
-        }
-        else
-            return "";
+        var line = session.getLine(row);
+        if (this.foldingStartMarker.test(line))
+            return "start";
+        if (foldStyle == "markbeginend"
+                && this.foldingStopMarker
+                && this.foldingStopMarker.test(line))
+            return "end";
+        return "";
     };
     
     this.getFoldWidgetRange = function(session, foldStyle, row) {
         return null;
     };
 
-    this.indentationBlock = function(session, foldStyle, row) {
+    this.indentationBlock = function(session, row, column) {
         var re = /^\s*/;
         var startRow = row;
         var endRow = row;
         var line = session.getLine(row);
-        var startColumn = line.length - 1;
+        var startColumn = column || line.length;
         var startLevel = line.match(re)[0].length;
-
-        while (line = session.getLine(++row)) {
+        var maxRow = session.getLength()
+        
+        while (++row < maxRow) {
+            line = session.getLine(row);
             var level = line.match(re)[0].length;
 
             if (level == line.length)
@@ -10474,19 +10515,21 @@ var FoldMode = exports.FoldMode = function() {};
         }
     };
 
-    this.$testStart = function(session, foldStyle, row) {
-        if (this.foldingStartMarker.test(session.getLine(row)))
-            return "start";
-        return "";
-    };
-    
-    this.$testBoth = function(session, foldStyle, row) {
-        var line = session.getLine(row);
-        if (this.foldingStartMarker.test(line))
-            return "start";
-        if (foldStyle == "markbeginend" && this.foldingStopMarker.test(line))
-            return "end";
-        return "";
+    this.openingBracketBlock = function(session, bracket, row, column) {
+        var start = {row: row, column: column + 1};
+        var end = session.$findClosingBracket(bracket, start);
+        if (!end)
+            return;
+
+        var fw = session.foldWidgets[end.row];
+        if (fw == null)
+            fw = this.getFoldWidget(session, end.row);
+
+        if (fw == "start") {
+            end.row --;
+            end.column = session.getLine(end.row).length;
+        }
+        return Range.fromPoints(start, end);
     };
 
 }).call(FoldMode.prototype);
@@ -10532,6 +10575,7 @@ var FoldMode = exports.FoldMode = function() {};
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/clojure', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/clojure_highlight_rules', 'ace/mode/matching_parens_outdent', 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -10652,6 +10696,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/clojure_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -10869,6 +10914,7 @@ exports.ClojureHighlightRules = ClojureHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/matching_parens_outdent', ['require', 'exports', 'module' , 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var Range = require("../range").Range;
 
@@ -10948,11 +10994,13 @@ exports.MatchingParensOutdent = MatchingParensOutdent;
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/mode/coffee', ['require', 'exports', 'module' , 'ace/tokenizer', 'ace/mode/coffee_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/range', 'ace/mode/text', 'ace/worker/worker_client', 'ace/lib/oop'], function(require, exports, module) {
+define('ace/mode/coffee', ['require', 'exports', 'module' , 'ace/tokenizer', 'ace/mode/coffee_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/mode/folding/pythonic', 'ace/range', 'ace/mode/text', 'ace/worker/worker_client', 'ace/lib/oop'], function(require, exports, module) {
+"use strict";
 
 var Tokenizer = require("../tokenizer").Tokenizer;
 var Rules = require("./coffee_highlight_rules").CoffeeHighlightRules;
 var Outdent = require("./matching_brace_outdent").MatchingBraceOutdent;
+var PythonFoldMode = require("./folding/pythonic").FoldMode;
 var Range = require("../range").Range;
 var TextMode = require("./text").Mode;
 var WorkerClient = require("../worker/worker_client").WorkerClient;
@@ -10961,6 +11009,7 @@ var oop = require("../lib/oop");
 function Mode() {
     this.$tokenizer = new Tokenizer(new Rules().getRules());
     this.$outdent   = new Outdent();
+    this.foldingRules = new PythonFoldMode("=|=>|->|\\s*class [^#]*");
 }
 
 oop.inherits(Mode, TextMode);
@@ -11066,6 +11115,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/coffee_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/lang', 'ace/lib/oop', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
     var lang = require("../lib/lang");
     var oop = require("../lib/oop");
@@ -11291,22 +11341,87 @@ define('ace/mode/coffee_highlight_rules', ['require', 'exports', 'module' , 'ace
  *
  * ***** END LICENSE BLOCK ***** */
 
+define('ace/mode/folding/pythonic', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/folding/fold_mode'], function(require, exports, module) {
+"use strict";
+
+var oop = require("../../lib/oop");
+var BaseFoldMode = require("./fold_mode").FoldMode;
+
+var FoldMode = exports.FoldMode = function(markers) {
+    this.foldingStartMarker = new RegExp("(?:([\\[{])|(" + markers + "))(?:\\s*)(?:#.*)?$");
+};
+oop.inherits(FoldMode, BaseFoldMode);
+
+(function() {
+
+    this.getFoldWidgetRange = function(session, foldStyle, row) {
+        var line = session.getLine(row);
+        var match = line.match(this.foldingStartMarker);
+        if (match) {
+            if (match[1])
+                return this.openingBracketBlock(session, match[1], row, match.index);
+            if (match[2])
+                return this.indentationBlock(session, row, match.index + match[2].length);
+            return this.indentationBlock(session, row);
+        }
+    }
+
+}).call(FoldMode.prototype);
+
+});/* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is Ajax.org Code Editor (ACE).
+ *
+ * The Initial Developer of the Original Code is
+ * Ajax.org B.V.
+ * Portions created by the Initial Developer are Copyright (C) 2010
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *      Fabian Jakobs <fabian AT ajax DOT org>
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
 define('ace/worker/worker_client', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/event_emitter'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var EventEmitter = require("../lib/event_emitter").EventEmitter;
 
-var WorkerClient = function(topLevelNamespaces, packagedJs, module, classname) {
+var WorkerClient = function(topLevelNamespaces, packagedJs, mod, classname) {
 
     this.changeListener = this.changeListener.bind(this);
 
-    if (window.require.packaged) {
+    if (module.packaged) {
         var base = this.$guessBasePath();
-        var worker = this.$worker = new Worker(base + packagedJs);
+        this.$worker = new Worker(base + packagedJs);
     }
     else {
         var workerUrl = this.$normalizePath(require.nameToUrl("ace/worker/worker", null, "_"));
-        var worker = this.$worker = new Worker(workerUrl);
+        this.$worker = new Worker(workerUrl);
 
         var tlns = {};
         for (var i=0; i<topLevelNamespaces.length; i++) {
@@ -11320,7 +11435,7 @@ var WorkerClient = function(topLevelNamespaces, packagedJs, module, classname) {
     this.$worker.postMessage({
         init : true,
         tlns: tlns,
-        module: module,
+        module: mod,
         classname: classname
     });
 
@@ -11340,7 +11455,7 @@ var WorkerClient = function(topLevelNamespaces, packagedJs, module, classname) {
                 break;
 
             case "event":
-                _self._dispatchEvent(msg.name, {data: msg.data});
+                _self._emit(msg.name, {data: msg.data});
                 break;
 
             case "call":
@@ -11359,12 +11474,11 @@ var WorkerClient = function(topLevelNamespaces, packagedJs, module, classname) {
     oop.implement(this, EventEmitter);
 
     this.$normalizePath = function(path) {
-        if (!path.match(/^\w+:/)) {
-            path = location.protocol + "//" + location.host
-                // paths starting with a slash are relative to the root (host)
-                + (path.charAt(0) == "/" ? "" : location.pathname.replace(/\/[^\/]*$/, ""))
-                + "/" + path.replace(/^[\/]+/, "");
-        }
+        path = path.replace(/^[a-z]+:\/\/[^\/]+\//, ""); // Remove domain name and rebuild it
+        path = location.protocol + "//" + location.host
+            // paths starting with a slash are relative to the root (host)
+            + (path.charAt(0) == "/" ? "" : location.pathname.replace(/\/[^\/]*$/, ""))
+            + "/" + path.replace(/^[\/]+/, "");
         return path;
     };
 
@@ -11384,7 +11498,7 @@ var WorkerClient = function(topLevelNamespaces, packagedJs, module, classname) {
             if (!src) {
                 continue;
             }
-            var m = src.match(/^(?:(.*\/)ace\.js|(.*\/)ace-uncompressed\.js)(?:\?|$)/);
+            var m = src.match(/^(?:(.*\/)ace\.js|(.*\/)ace(-uncompressed)?(-noconflict)?\.js)(?:\?|$)/);
             if (m)
                 return m[1] || m[2];
         }
@@ -11392,7 +11506,7 @@ var WorkerClient = function(topLevelNamespaces, packagedJs, module, classname) {
     };
 
     this.terminate = function() {
-        this._dispatchEvent("terminate", {});
+        this._emit("terminate", {});
         this.$worker.terminate();
         this.$worker = null;
         this.$doc.removeEventListener("change", this.changeListener);
@@ -11481,6 +11595,7 @@ exports.WorkerClient = WorkerClient;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/coldfusion', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/xml', 'ace/mode/javascript', 'ace/mode/css', 'ace/tokenizer', 'ace/mode/coldfusion_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var XmlMode = require("./xml").Mode;
@@ -11551,6 +11666,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/xml', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/xml_highlight_rules', 'ace/mode/behaviour/xml', 'ace/mode/folding/xml'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -11568,7 +11684,6 @@ var Mode = function() {
 oop.inherits(Mode, TextMode);
 
 (function() {
-    
     
     this.getNextLineIndent = function(state, line, tab) {
         return this.$getIndent(line);
@@ -11616,6 +11731,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/xml_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/xml_util', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var xmlUtil = require("./xml_util");
@@ -11717,7 +11833,18 @@ exports.XmlHighlightRules = XmlHighlightRules;
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/mode/xml_util', ['require', 'exports', 'module' ], function(require, exports, module) {
+define('ace/mode/xml_util', ['require', 'exports', 'module' , 'ace/lib/lang'], function(require, exports, module) {
+"use strict";
+
+var lang = require("../lib/lang");
+
+var formTags = lang.arrayToMap(
+    ("button|form|input|label|select|textarea").split("|")
+);
+
+var tableTags = lang.arrayToMap(
+    ("table|tbody|td|tfoot|th|tr").split("|")
+);
 
 function string(state) {
     return [{
@@ -11757,9 +11884,33 @@ exports.tag = function(states, name, nextState) {
         token : "text",
         regex : "\\s+"
     }, {
-        token : "meta.tag",
+        //token : "meta.tag",
+        
+    token : function(value) {
+            if ( value==='a' ) {
+                return "meta.tag.anchor";
+            }
+            else if ( value==='img' ) {
+                return "meta.tag.image";
+            }
+            else if ( value==='script' ) {
+                return "meta.tag.script";
+            }
+            else if ( value==='style' ) {
+                return "meta.tag.style";
+            }
+            else if (formTags.hasOwnProperty(value.toLowerCase())) {
+                return "meta.tag.form";
+            }
+            else if (tableTags.hasOwnProperty(value.toLowerCase())) {
+                return "meta.tag.table";
+            }
+            else {
+                return "meta.tag";
+            }
+        },        
         merge : true,
-        regex : "[-_a-zA-Z0-9:]+",
+        regex : "[-_a-zA-Z0-9:!]+",
         next : name + "embed-attribute-list" 
     }, {
         token: "empty",
@@ -11830,6 +11981,7 @@ exports.tag = function(states, name, nextState) {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/behaviour/xml', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/behaviour', 'ace/mode/behaviour/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../../lib/oop");
 var Behaviour = require("../behaviour").Behaviour;
@@ -11918,9 +12070,11 @@ exports.XmlBehaviour = XmlBehaviour;
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/mode/folding/xml', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/range', 'ace/mode/folding/fold_mode', 'ace/token_iterator'], function(require, exports, module) {
+define('ace/mode/folding/xml', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/range', 'ace/mode/folding/fold_mode', 'ace/token_iterator'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../../lib/oop");
+var lang = require("../../lib/lang");
 var Range = require("../../range").Range;
 var BaseFoldMode = require("./fold_mode").FoldMode;
 var TokenIterator = require("../../token_iterator").TokenIterator;
@@ -11934,121 +12088,210 @@ oop.inherits(FoldMode, BaseFoldMode);
 (function() {
 
     this.getFoldWidget = function(session, foldStyle, row) {
-        var tags = session.getTokens(row, row)[0].tokens
-            .filter(function(token) {
-                return token.type === "meta.tag";
-            })
-            .map(function(token) {
-                return token.value;
-            }).
-            join("")
-            .trim()
-            .replace(/^<|>$|\s+/g, "")
-            .split("><");
-        var fold = tags[0];
-        
-        if (!fold || this.voidElements[fold])
-            return "";
-            
-        if (fold.charAt(0) == "/")
+        var tag = this._getFirstTagInLine(session, row);
+
+        if (tag.closing)
             return foldStyle == "markbeginend" ? "end" : "";
-            
-        if (fold.charAt(fold.length-1) == "/")
+
+        if (!tag.tagName || this.voidElements[tag.tagName.toLowerCase()])
             return "";
-            
-        if (tags.indexOf("/" + fold) !== -1)
+
+        if (tag.selfClosing)
             return "";
-            
+
+        if (tag.value.indexOf("/" + tag.tagName) !== -1)
+            return "";
+
         return "start";
     };
-        
-    this.getFoldWidgetRange = function(session, foldStyle, row) {
-        var start, end;
-        var stack = [];
-        var voidElements = this.voidElements;
-        
-        var iterator = new TokenIterator(session, row, 0);
-        var step = "stepForward";
-        var isBack = false;
-            
-        function pop(stack, tagName) {
-            while (stack.length) {
-                var top = stack[stack.length-1];
-                if (!tagName || top === "" || top == tagName) {
-                    stack.pop();
-                    return true;
-                }
-                if (voidElements[top]) {
-                    stack.pop();
-                    continue;
-                }
-                else
-                    return false;
-            }
-            return false;
+    
+    this._getFirstTagInLine = function(session, row) {
+        var tokens = session.getTokens(row, row)[0].tokens;
+        var value = "";
+        for (var i = 0; i < tokens.length; i++) {
+            var token = tokens[i];
+            if (token.type.indexOf("meta.tag") === 0)
+                value += token.value;
+            else
+                value += lang.stringRepeat(" ", token.value.length);
         }
-            
-        // limited XML parsing to find matching tag
-        do {
-            var token = iterator.getCurrentToken();
+        
+        return this._parseTag(value);
+    };
 
-            var value = token.value.trim();
-            if (token && token.type == "meta.tag" && token.value !== ">") {
-                var tagName = value.replace(/^[<\s]*|[\s*>]$/g, "");
-                if (!start) {
-                    if (tagName.charAt(0) == "/") {
-                        tagName = tagName.slice(1);
-                        step = "stepBackward";
-                        isBack = true;
-                    }
-                    
-                    start = {
-                        row: row,
-                        column: iterator.getCurrentTokenColumn() + (isBack ? 0 : value.length + 1)
-                    };
+    this.tagRe = /^(\s*)(<?(\/?)([-_a-zA-Z0-9:!]*)\s*(\/?)>?)/;
+    this._parseTag = function(tag) {
+        
+        var match = this.tagRe.exec(tag);
+        var column = this.tagRe.lastIndex || 0;
+        this.tagRe.lastIndex = 0;
 
-                    stack.push(tagName);
-                }
-                else {
-                    var close;
-                    if (tagName.charAt(0) == "/") {
-                        tagName = tagName.slice(1);
-                        close = !isBack;
-                    }
-                    else if (tagName.charAt(tagName.length-1) == "/") {
-                        tagName = "";
-                        close = !isBack;
-                    }
-                    else
-                        close = isBack;
-                        
-                    if (close) {
-                        if (pop(stack, tagName)) {
-                            if (stack.length === 0) {
-                                end = {
-                                    row: iterator.getCurrentTokenRow(),
-                                    column: iterator.getCurrentTokenColumn() + (isBack ? value.length + 1 : 0)
-                                };
-                                if (isBack)
-                                    return Range.fromPoints(end, start);
-                                else
-                                    return Range.fromPoints(start, end);
-                            }
-                        }
-                        else {
-                            if (!(isBack && voidElements[tagName]))
-                                typeof console !== undefined && console.error("unmatched tags!", tagName, stack);
-                        }
-                    }
-                    else {
-                        stack.push(tagName);
-                    }
-                }
-            }
-            
-        } while(token = iterator[step]());
+        return {
+            value: tag,
+            match: match ? match[2] : "",
+            closing: match ? !!match[3] : false,
+            selfClosing: match ? !!match[5] || match[2] == "/>" : false,
+            tagName: match ? match[4] : "",
+            column: match[1] ? column + match[1].length : column
+        };
     };
     
+    /**
+     * reads a full tag and places the iterator after the tag
+     */
+    this._readTagForward = function(iterator) {
+        var token = iterator.getCurrentToken();
+        if (!token)
+            return null;
+            
+        var value = "";
+        var start;
+        
+        do {
+            if (token.type.indexOf("meta.tag") === 0) {
+                if (!start) {
+                    var start = {
+                        row: iterator.getCurrentTokenRow(),
+                        column: iterator.getCurrentTokenColumn()
+                    };
+                }
+                value += token.value;
+                if (value.indexOf(">") !== -1) {
+                    var tag = this._parseTag(value);
+                    tag.start = start;
+                    tag.end = {
+                        row: iterator.getCurrentTokenRow(),
+                        column: iterator.getCurrentTokenColumn() + token.value.length
+                    };
+                    iterator.stepForward();
+                    return tag;
+                }
+            }
+        } while(token = iterator.stepForward());
+        
+        return null;
+    };
+    
+    this._readTagBackward = function(iterator) {
+        var token = iterator.getCurrentToken();
+        if (!token)
+            return null;
+            
+        var value = "";
+        var end;
+
+        do {
+            if (token.type.indexOf("meta.tag") === 0) {
+                if (!end) {
+                    end = {
+                        row: iterator.getCurrentTokenRow(),
+                        column: iterator.getCurrentTokenColumn() + token.value.length
+                    };
+                }
+                value = token.value + value;
+                if (value.indexOf("<") !== -1) {
+                    var tag = this._parseTag(value);
+                    tag.end = end;
+                    tag.start = {
+                        row: iterator.getCurrentTokenRow(),
+                        column: iterator.getCurrentTokenColumn()
+                    };
+                    iterator.stepBackward();
+                    return tag;
+                }
+            }
+        } while(token = iterator.stepBackward());
+        
+        return null;
+    };
+    
+    this._pop = function(stack, tag) {
+        while (stack.length) {
+            
+            var top = stack[stack.length-1];
+            if (!tag || top.tagName == tag.tagName) {
+                return stack.pop();
+            }
+            else if (this.voidElements[tag.tagName]) {
+                return;
+            }
+            else if (this.voidElements[top.tagName]) {
+                stack.pop();
+                continue;
+            } else {
+                return null;
+            }
+        }
+    };
+    
+    this.getFoldWidgetRange = function(session, foldStyle, row) {
+        var firstTag = this._getFirstTagInLine(session, row);
+        
+        if (!firstTag.match)
+            return null;
+        
+        var isBackward = firstTag.closing || firstTag.selfClosing;
+        var stack = [];
+        var tag;
+        
+        if (!isBackward) {
+            var iterator = new TokenIterator(session, row, firstTag.column);
+            var start = {
+                row: row,
+                column: firstTag.column + firstTag.tagName.length + 2
+            };
+            while (tag = this._readTagForward(iterator)) {
+                if (tag.selfClosing) {
+                    if (!stack.length) {
+                        tag.start.column += tag.tagName.length + 2;
+                        tag.end.column -= 2;
+                        return Range.fromPoints(tag.start, tag.end);
+                    } else
+                        continue;
+                }
+                
+                if (tag.closing) {
+                    this._pop(stack, tag);
+                    if (stack.length == 0)
+                        return Range.fromPoints(start, tag.start);
+                }
+                else {
+                    stack.push(tag)
+                }
+            }
+        }
+        else {
+            var iterator = new TokenIterator(session, row, firstTag.column + firstTag.match.length);
+            var end = {
+                row: row,
+                column: firstTag.column
+            };
+            
+            while (tag = this._readTagBackward(iterator)) {
+                if (tag.selfClosing) {
+                    if (!stack.length) {
+                        tag.start.column += tag.tagName.length + 2;
+                        tag.end.column -= 2;
+                        return Range.fromPoints(tag.start, tag.end);
+                    } else
+                        continue;
+                }
+                
+                if (!tag.closing) {
+                    this._pop(stack, tag);
+                    if (stack.length == 0) {
+                        tag.start.column += tag.tagName.length + 2;
+                        return Range.fromPoints(tag.start, end);
+                    }
+                }
+                else {
+                    stack.push(tag)
+                }
+            }
+        }
+        
+    };
+
 }).call(FoldMode.prototype);
 
 });/* ***** BEGIN LICENSE BLOCK *****
@@ -12089,6 +12332,7 @@ oop.inherits(FoldMode, BaseFoldMode);
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/javascript', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/javascript_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/range', 'ace/worker/worker_client', 'ace/mode/behaviour/cstyle', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -12253,6 +12497,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/javascript_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/unicode', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -12577,6 +12822,7 @@ exports.JavaScriptHighlightRules = JavaScriptHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/css', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/css_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/worker/worker_client', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -12686,6 +12932,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/css_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -12951,6 +13198,7 @@ exports.CssHighlightRules = CssHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/coldfusion_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/css_highlight_rules', 'ace/mode/javascript_highlight_rules', 'ace/mode/text_highlight_rules', 'ace/mode/xml_util'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var CssHighlightRules = require("./css_highlight_rules").CssHighlightRules;
@@ -13048,6 +13296,7 @@ oop.inherits(ColdfusionHighlightRules, TextHighlightRules);
 exports.ColdfusionHighlightRules = ColdfusionHighlightRules;
 });
 define('ace/mode/csharp', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/csharp_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/mode/behaviour/cstyle', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -13105,6 +13354,7 @@ oop.inherits(Mode, TextMode);
 exports.Mode = Mode;
 });
 define('ace/mode/csharp_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -13208,6 +13458,7 @@ oop.inherits(CSharpHighlightRules, TextHighlightRules);
 exports.CSharpHighlightRules = CSharpHighlightRules;
 });
 define('ace/mode/groovy', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/javascript', 'ace/tokenizer', 'ace/mode/groovy_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var JavaScriptMode = require("./javascript").Mode;
@@ -13231,6 +13482,7 @@ oop.inherits(Mode, JavaScriptMode);
 exports.Mode = Mode;
 });
 define('ace/mode/groovy_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -13373,6 +13625,7 @@ oop.inherits(GroovyHighlightRules, TextHighlightRules);
 exports.GroovyHighlightRules = GroovyHighlightRules;
 });
 define('ace/mode/haxe', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/haxe_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/mode/behaviour/cstyle', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -13430,6 +13683,7 @@ oop.inherits(Mode, TextMode);
 exports.Mode = Mode;
 });
 define('ace/mode/haxe_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -13570,6 +13824,7 @@ exports.HaxeHighlightRules = HaxeHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/html', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/mode/javascript', 'ace/mode/css', 'ace/tokenizer', 'ace/mode/html_highlight_rules', 'ace/mode/behaviour/xml', 'ace/mode/folding/html'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -13652,6 +13907,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/html_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/css_highlight_rules', 'ace/mode/javascript_highlight_rules', 'ace/mode/xml_util', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var CssHighlightRules = require("./css_highlight_rules").CssHighlightRules;
@@ -13665,7 +13921,7 @@ var HtmlHighlightRules = function() {
     // regexps are ordered -> the first match is used
     this.$rules = {
         start : [{
-            token : "meta.tag",
+            token : "text",
             merge : true,
             regex : "<\\!\\[CDATA\\[",
             next : "cdata"
@@ -13679,11 +13935,11 @@ var HtmlHighlightRules = function() {
             next : "comment"
         }, {
             token : "meta.tag",
-            regex : "<(?=\s*script)",
+            regex : "<(?=\s*script\\b)",
             next : "script"
         }, {
             token : "meta.tag",
-            regex : "<(?=\s*style)",
+            regex : "<(?=\s*style\\b)",
             next : "css"
         }, {
             token : "meta.tag", // opening tag
@@ -13785,6 +14041,7 @@ exports.HtmlHighlightRules = HtmlHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/folding/html', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/folding/mixed', 'ace/mode/folding/xml', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../../lib/oop");
 var MixedFoldMode = require("./mixed").FoldMode;
@@ -13869,6 +14126,7 @@ oop.inherits(FoldMode, MixedFoldMode);
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/folding/mixed', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/folding/fold_mode'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../../lib/oop");
 var BaseFoldMode = require("./fold_mode").FoldMode;
@@ -13918,6 +14176,7 @@ oop.inherits(FoldMode, BaseFoldMode);
 }).call(FoldMode.prototype);
 
 });define('ace/mode/java', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/javascript', 'ace/tokenizer', 'ace/mode/java_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var JavaScriptMode = require("./javascript").Mode;
@@ -13942,6 +14201,7 @@ oop.inherits(Mode, JavaScriptMode);
 exports.Mode = Mode;
 });
 define('ace/mode/java_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -14122,6 +14382,7 @@ exports.JavaHighlightRules = JavaHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/json', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/json_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/mode/behaviour/cstyle', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -14203,10 +14464,10 @@ exports.Mode = Mode;
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/mode/json_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+define('ace/mode/json_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
-var lang = require("../lib/lang");
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
 var JsonHighlightRules = function() {
@@ -14253,6 +14514,7 @@ oop.inherits(JsonHighlightRules, TextHighlightRules);
 exports.JsonHighlightRules = JsonHighlightRules;
 });
 define('ace/mode/latex', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/latex_highlight_rules', 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -14266,12 +14528,10 @@ var Mode = function()
 };
 oop.inherits(Mode, TextMode);
 
-(function()
-{
+(function() {
     this.toggleCommentLines = function(state, doc, startRow, endRow) {
         // This code is adapted from ruby.js
         var outdent = true;
-        var outentedRows = [];
         
         // LaTeX comments begin with % and go to the end of the line
         var commentRegEx = /^(\s*)\%/;
@@ -14311,12 +14571,12 @@ exports.Mode = Mode;
 
 });
 define('ace/mode/latex_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
-var LatexHighlightRules = function()
-{   
+var LatexHighlightRules = function() {   
     this.$rules = {
         "start" : [{
             // A tex command e.g. \foo
@@ -14387,12 +14647,13 @@ exports.LatexHighlightRules = LatexHighlightRules;
 *
 * ***** END LICENSE BLOCK ***** */
 
-define('ace/mode/lua', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/lua_highlight_rules', 'ace/range'], function(require, exports, module) {
+define('ace/mode/lua', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/lua_highlight_rules'], function(require, exports, module) {
+"use strict";
+
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
 var Tokenizer = require("../tokenizer").Tokenizer;
 var LuaHighlightRules = require("./lua_highlight_rules").LuaHighlightRules;
-var Range = require("../range").Range;
 
 var Mode = function() {
     this.$tokenizer = new Tokenizer(new LuaHighlightRules().getRules());
@@ -14405,7 +14666,6 @@ oop.inherits(Mode, TextMode);
 
         var tokenizedLine = this.$tokenizer.getLineTokens(line, state);
         var tokens = tokenizedLine.tokens;
-        var endState = tokenizedLine.state;
 	
         var chunks = ["function", "then", "do", "repeat"];
         
@@ -14428,39 +14688,6 @@ oop.inherits(Mode, TextMode);
 
         return indent;
     };
-    
-    /*this.checkOutdent = function(state, line, input) {
-        if (input !== "\r\n" && input !== "\r" && input !== "\n")
-            return false;
-
-        var tokens = this.$tokenizer.getLineTokens(line.trim(), state).tokens;
-        
-        if (!tokens)
-            return false;
-        
-        // ignore trailing comments
-        do {
-            var last = tokens.pop();
-        } while (last && (last.type == "comment" || (last.type == "text" && last.value.match(/^\s+$/))));
-        
-        if (!last)
-            return false;
-        var outdents = {
-            "end" : 1,
-            "until" : 1,
-            "else" : 1
-        }
-        return (last.type == "keyword" && outdents[last.value]);
-    };
-    
-    this.autoOutdent = function(state, doc, row) {
-        console.log(doc, row);
-        var indent = this.$getIndent(doc.getLine(row));
-        var tab = doc.getTabString();
-        if (indent.slice(-tab.length) == tab)
-            doc.remove(new Range(row, indent.length-tab.length, row, indent.length));
-
-    };*/
     
 }).call(Mode.prototype);
 
@@ -14508,6 +14735,7 @@ exports.Mode = Mode;
 * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/lua_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -14943,7 +15171,8 @@ exports.LuaHighlightRules = LuaHighlightRules;
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/mode/markdown', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/mode/javascript', 'ace/mode/xml', 'ace/mode/html', 'ace/tokenizer', 'ace/mode/markdown_highlight_rules', 'ace/range'], function(require, exports, module) {
+define('ace/mode/markdown', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/mode/javascript', 'ace/mode/xml', 'ace/mode/html', 'ace/tokenizer', 'ace/mode/markdown_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -14952,7 +15181,6 @@ var XmlMode = require("./xml").Mode;
 var HtmlMode = require("./html").Mode;
 var Tokenizer = require("../tokenizer").Tokenizer;
 var MarkdownHighlightRules = require("./markdown_highlight_rules").MarkdownHighlightRules;
-var Range = require("../range").Range;
 
 var Mode = function() {
     var highlighter = new MarkdownHighlightRules();
@@ -15022,6 +15250,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/markdown_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text_highlight_rules', 'ace/mode/javascript_highlight_rules', 'ace/mode/xml_highlight_rules', 'ace/mode/html_highlight_rules', 'ace/mode/css_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
@@ -15031,11 +15260,11 @@ var HtmlHighlightRules = require("./html_highlight_rules").HtmlHighlightRules;
 var CssHighlightRules = require("./css_highlight_rules").CssHighlightRules;
 
 function github_embed(tag, prefix) {
-  return { // Github style block
-    token : "support.function",
-    regex : "^```" + tag + "\\s*$",
-    next  : prefix + "start"
-  }
+    return { // Github style block
+        token : "support.function",
+        regex : "^```" + tag + "\\s*$",
+        next  : prefix + "start"
+    };
 }
 
 var MarkdownHighlightRules = function() {
@@ -15214,6 +15443,7 @@ exports.MarkdownHighlightRules = MarkdownHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/ocaml', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/ocaml_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -15318,6 +15548,7 @@ exports.Mode = Mode;
  */
 
 define('ace/mode/ocaml_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -15670,6 +15901,7 @@ exports.OcamlHighlightRules = OcamlHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/perl', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/perl_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/range', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -15786,6 +16018,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/perl_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -15916,6 +16149,849 @@ oop.inherits(PerlHighlightRules, TextHighlightRules);
 exports.PerlHighlightRules = PerlHighlightRules;
 });
 /* ***** BEGIN LICENSE BLOCK *****
+* The Original Code is Ajax.org Code Editor (ACE).
+*
+* Contributor(s):
+*      Jonathan Camile <jonathan.camile AT gmail DOT com>
+*
+* Alternatively, the contents of this file may be used under the terms of
+* either the GNU General Public License Version 2 or later (the "GPL"), or
+* the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+* in which case the provisions of the GPL or the LGPL are applicable instead
+* of those above. If you wish to allow use of your version of this file only
+* under the terms of either the GPL or the LGPL, and not to allow others to
+* use your version of this file under the terms of the MPL, indicate your
+* decision by deleting the provisions above and replace them with the notice
+* and other provisions required by the GPL or the LGPL. If you do not delete
+* the provisions above, a recipient may use your version of this file under
+* the terms of any one of the MPL, the GPL or the LGPL.
+*
+* ***** END LICENSE BLOCK ***** */
+
+define('ace/mode/pgsql', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/pgsql_highlight_rules', 'ace/range'], function(require, exports, module) {
+
+    var oop = require("ace/lib/oop");
+    var TextMode = require("ace/mode/text").Mode;
+    var Tokenizer = require("ace/tokenizer").Tokenizer;
+    var PgsqlHighlightRules = require("ace/mode/pgsql_highlight_rules").PgsqlHighlightRules;
+    var Range = require("ace/range").Range;
+    // var EditSession = require("ace/edit_session").EditSession;
+
+    var Mode = function() {
+        this.$tokenizer = new Tokenizer(new PgsqlHighlightRules().getRules());
+    };
+    oop.inherits(Mode, TextMode);
+
+    (function() {
+
+        this.toggleCommentLines = function(state, doc, startRow, endRow) {
+            var outdent = true;
+            // var outentedRows = [];
+            var re = /^(\s*)--/;
+
+            for (var i=startRow; i<= endRow; i++) {
+                if (!re.test(doc.getLine(i))) {
+                    outdent = false;
+                    break;
+                }
+            }
+
+            if (outdent) {
+                var deleteRange = new Range(0, 0, 0, 0);
+                for (var i=startRow; i<= endRow; i++)
+                {
+                    var line = doc.getLine(i);
+                    var m = line.match(re);
+                    deleteRange.start.row = i;
+                    deleteRange.end.row = i;
+                    deleteRange.end.column = m[0].length;
+                    doc.replace(deleteRange, m[1]);
+                }
+            }
+            else {
+                doc.indentRows(startRow, endRow, "--");
+            }
+        };
+
+
+        this.getNextLineIndent = function(state, line, tab) { 
+            if (state == "start" || state == "keyword.statementEnd") {
+                return "";
+            } else {
+                return this.$getIndent(line); // Keep whatever indent the previous line has
+            }
+        }
+
+    }).call(Mode.prototype);
+
+    exports.Mode = Mode;
+});
+/* ***** BEGIN LICENSE BLOCK *****
+ * The Original Code is Ajax.org Code Editor (ACE).
+ *
+ * Contributor(s):
+ *      John DeSoi, Ph.D. <desoi AT pgedit DOT com>
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK *****
+ *
+ */
+
+
+define('ace/mode/pgsql_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules', 'ace/mode/perl_highlight_rules', 'ace/mode/python_highlight_rules'], function(require, exports, module) {
+
+var oop = require("ace/lib/oop");
+var lang = require("ace/lib/lang");
+var DocCommentHighlightRules = require("./doc_comment_highlight_rules").DocCommentHighlightRules;
+var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+// Supporting perl and python for now -- both in pg core and ace
+var PerlHighlightRules = require("./perl_highlight_rules").PerlHighlightRules;
+var PythonHighlightRules = require("./python_highlight_rules").PythonHighlightRules;
+
+var PgsqlHighlightRules = function() {
+    
+    // Keywords, functions, operators last updated for pg 9.1.
+    var keywords = lang.arrayToMap(
+        ("abort|absolute|abstime|access|aclitem|action|add|admin|after|aggregate|all|also|alter|always|" +
+        "analyse|analyze|and|any|anyarray|anyelement|anyenum|anynonarray|array|as|asc|assertion|" +
+        "assignment|asymmetric|at|attribute|authorization|backward|before|begin|between|bigint|" +
+        "binary|bit|bool|boolean|both|box|bpchar|by|bytea|cache|called|cascade|cascaded|case|cast|" +
+        "catalog|chain|char|character|characteristics|check|checkpoint|cid|cidr|circle|class|close|" +
+        "cluster|coalesce|collate|collation|column|comment|comments|commit|committed|concurrently|" +
+        "configuration|connection|constraint|constraints|content|continue|conversion|copy|cost|" +
+        "create|cross|cstring|csv|current|current_catalog|current_date|current_role|" +
+        "current_schema|current_time|current_timestamp|current_user|cursor|cycle|data|database|" +
+        "date|day|deallocate|dec|decimal|declare|default|defaults|deferrable|deferred|definer|delete|" +
+        "delimiter|delimiters|desc|dictionary|disable|discard|distinct|do|document|domain|double|" +
+        "drop|each|else|enable|encoding|encrypted|end|enum|escape|except|exclude|excluding|exclusive|" +
+        "execute|exists|explain|extension|external|extract|false|family|fdw_handler|fetch|first|" +
+        "float|float4|float8|following|for|force|foreign|forward|freeze|from|full|function|functions|" +
+        "global|grant|granted|greatest|group|gtsvector|handler|having|header|hold|hour|identity|if|" +
+        "ilike|immediate|immutable|implicit|in|including|increment|index|indexes|inet|inherit|" +
+        "inherits|initially|inline|inner|inout|input|insensitive|insert|instead|int|int2|int2vector|" +
+        "int4|int8|integer|internal|intersect|interval|into|invoker|is|isnull|isolation|join|key|label|" +
+        "language|language_handler|large|last|lc_collate|lc_ctype|leading|least|left|level|like|" +
+        "limit|line|listen|load|local|localtime|localtimestamp|location|lock|lseg|macaddr|mapping|" +
+        "match|maxvalue|minute|minvalue|mode|money|month|move|name|names|national|natural|nchar|next|no|" +
+        "none|not|nothing|notify|notnull|nowait|null|nullif|nulls|numeric|object|of|off|offset|oid|oids|" +
+        "oidvector|on|only|opaque|operator|option|options|or|order|out|outer|over|overlaps|overlay|" +
+        "owned|owner|parser|partial|partition|passing|password|path|pg_attribute|pg_auth_members|" +
+        "pg_authid|pg_class|pg_database|pg_node_tree|pg_proc|pg_type|placing|plans|point|polygon|" +
+        "position|preceding|precision|prepare|prepared|preserve|primary|prior|privileges|" +
+        "procedural|procedure|quote|range|read|real|reassign|recheck|record|recursive|ref|refcursor|" +
+        "references|regclass|regconfig|regdictionary|regoper|regoperator|regproc|regprocedure|" +
+        "regtype|reindex|relative|release|reltime|rename|repeatable|replace|replica|reset|restart|" +
+        "restrict|returning|returns|revoke|right|role|rollback|row|rows|rule|savepoint|schema|scroll|" +
+        "search|second|security|select|sequence|sequences|serializable|server|session|session_user|" +
+        "set|setof|share|show|similar|simple|smallint|smgr|some|stable|standalone|start|statement|" +
+        "statistics|stdin|stdout|storage|strict|strip|substring|symmetric|sysid|system|table|tables|" +
+        "tablespace|temp|template|temporary|text|then|tid|time|timestamp|timestamptz|timetz|" +
+        "tinterval|to|trailing|transaction|treat|trigger|trim|true|truncate|trusted|tsquery|tsvector|" +
+        "txid_snapshot|type|unbounded|uncommitted|unencrypted|union|unique|unknown|unlisten|" +
+        "unlogged|until|update|user|using|uuid|vacuum|valid|validate|validator|value|values|varbit|" +
+        "varchar|variadic|varying|verbose|version|view|void|volatile|when|where|whitespace|window|" +
+        "with|without|work|wrapper|write|xid|xml|xmlattributes|xmlconcat|xmlelement|xmlexists|" +
+        "xmlforest|xmlparse|xmlpi|xmlroot|xmlserialize|year|yes|zone").split("|")
+    );
+    
+    
+    var builtinFunctions = lang.arrayToMap(
+        ("RI_FKey_cascade_del|RI_FKey_cascade_upd|RI_FKey_check_ins|RI_FKey_check_upd|" +
+        "RI_FKey_noaction_del|RI_FKey_noaction_upd|RI_FKey_restrict_del|RI_FKey_restrict_upd|" +
+        "RI_FKey_setdefault_del|RI_FKey_setdefault_upd|RI_FKey_setnull_del|" +
+        "RI_FKey_setnull_upd|abbrev|abs|abstime|abstimeeq|abstimege|abstimegt|abstimein|abstimele|" +
+        "abstimelt|abstimene|abstimeout|abstimerecv|abstimesend|aclcontains|aclexplode|aclinsert|" +
+        "aclitemeq|aclitemin|aclitemout|aclremove|acos|age|any_in|any_out|anyarray_in|anyarray_out|" +
+        "anyarray_recv|anyarray_send|anyelement_in|anyelement_out|anyenum_in|anyenum_out|" +
+        "anynonarray_in|anynonarray_out|anytextcat|area|areajoinsel|areasel|array_agg|" +
+        "array_agg_finalfn|array_agg_transfn|array_append|array_cat|array_dims|array_eq|" +
+        "array_fill|array_ge|array_gt|array_in|array_larger|array_le|array_length|array_lower|" +
+        "array_lt|array_ndims|array_ne|array_out|array_prepend|array_recv|array_send|" +
+        "array_smaller|array_to_string|array_upper|arraycontained|arraycontains|arrayoverlap|" +
+        "ascii|ascii_to_mic|ascii_to_utf8|asin|atan|atan2|avg|big5_to_euc_tw|big5_to_mic|" +
+        "big5_to_utf8|bit_and|bit_in|bit_length|bit_or|bit_out|bit_recv|bit_send|bitand|bitcat|" +
+        "bitcmp|biteq|bitge|bitgt|bitle|bitlt|bitne|bitnot|bitor|bitshiftleft|bitshiftright|" +
+        "bittypmodin|bittypmodout|bitxor|bool|bool_and|bool_or|booland_statefunc|booleq|boolge|" +
+        "boolgt|boolin|boolle|boollt|boolne|boolor_statefunc|boolout|boolrecv|boolsend|box|" +
+        "box_above|box_above_eq|box_add|box_below|box_below_eq|box_center|box_contain|" +
+        "box_contain_pt|box_contained|box_distance|box_div|box_eq|box_ge|box_gt|box_in|" +
+        "box_intersect|box_le|box_left|box_lt|box_mul|box_out|box_overabove|box_overbelow|" +
+        "box_overlap|box_overleft|box_overright|box_recv|box_right|box_same|box_send|box_sub|" +
+        "bpchar_larger|bpchar_pattern_ge|bpchar_pattern_gt|bpchar_pattern_le|" +
+        "bpchar_pattern_lt|bpchar_smaller|bpcharcmp|bpchareq|bpcharge|bpchargt|bpchariclike|" +
+        "bpcharicnlike|bpcharicregexeq|bpcharicregexne|bpcharin|bpcharle|bpcharlike|bpcharlt|" +
+        "bpcharne|bpcharnlike|bpcharout|bpcharrecv|bpcharregexeq|bpcharregexne|bpcharsend|" +
+        "bpchartypmodin|bpchartypmodout|broadcast|btabstimecmp|btarraycmp|btbeginscan|btboolcmp|" +
+        "btbpchar_pattern_cmp|btbuild|btbuildempty|btbulkdelete|btcharcmp|btcostestimate|" +
+        "btendscan|btfloat48cmp|btfloat4cmp|btfloat84cmp|btfloat8cmp|btgetbitmap|btgettuple|" +
+        "btinsert|btint24cmp|btint28cmp|btint2cmp|btint42cmp|btint48cmp|btint4cmp|btint82cmp|" +
+        "btint84cmp|btint8cmp|btmarkpos|btnamecmp|btoidcmp|btoidvectorcmp|btoptions|btrecordcmp|" +
+        "btreltimecmp|btrescan|btrestrpos|btrim|bttext_pattern_cmp|bttextcmp|bttidcmp|" +
+        "bttintervalcmp|btvacuumcleanup|byteacat|byteacmp|byteaeq|byteage|byteagt|byteain|byteale|" +
+        "bytealike|bytealt|byteane|byteanlike|byteaout|bytearecv|byteasend|cash_cmp|cash_div_cash|" +
+        "cash_div_flt4|cash_div_flt8|cash_div_int2|cash_div_int4|cash_eq|cash_ge|cash_gt|cash_in|" +
+        "cash_le|cash_lt|cash_mi|cash_mul_flt4|cash_mul_flt8|cash_mul_int2|cash_mul_int4|cash_ne|" +
+        "cash_out|cash_pl|cash_recv|cash_send|cash_words|cashlarger|cashsmaller|cbrt|ceil|ceiling|" +
+        "center|char|char_length|character_length|chareq|charge|chargt|charin|charle|charlt|charne|" +
+        "charout|charrecv|charsend|chr|cideq|cidin|cidout|cidr|cidr_in|cidr_out|cidr_recv|cidr_send|" +
+        "cidrecv|cidsend|circle|circle_above|circle_add_pt|circle_below|circle_center|" +
+        "circle_contain|circle_contain_pt|circle_contained|circle_distance|circle_div_pt|" +
+        "circle_eq|circle_ge|circle_gt|circle_in|circle_le|circle_left|circle_lt|circle_mul_pt|" +
+        "circle_ne|circle_out|circle_overabove|circle_overbelow|circle_overlap|circle_overleft|" +
+        "circle_overright|circle_recv|circle_right|circle_same|circle_send|circle_sub_pt|" +
+        "clock_timestamp|close_lb|close_ls|close_lseg|close_pb|close_pl|close_ps|close_sb|" +
+        "close_sl|col_description|concat|concat_ws|contjoinsel|contsel|convert|convert_from|" +
+        "convert_to|corr|cos|cot|count|covar_pop|covar_samp|cstring_in|cstring_out|cstring_recv|" +
+        "cstring_send|cume_dist|current_database|current_query|current_schema|current_schemas|" +
+        "current_setting|current_user|currtid|currtid2|currval|cursor_to_xml|" +
+        "cursor_to_xmlschema|database_to_xml|database_to_xml_and_xmlschema|" +
+        "database_to_xmlschema|date|date_cmp|date_cmp_timestamp|date_cmp_timestamptz|date_eq|" +
+        "date_eq_timestamp|date_eq_timestamptz|date_ge|date_ge_timestamp|date_ge_timestamptz|" +
+        "date_gt|date_gt_timestamp|date_gt_timestamptz|date_in|date_larger|date_le|" +
+        "date_le_timestamp|date_le_timestamptz|date_lt|date_lt_timestamp|date_lt_timestamptz|" +
+        "date_mi|date_mi_interval|date_mii|date_ne|date_ne_timestamp|date_ne_timestamptz|" +
+        "date_out|date_part|date_pl_interval|date_pli|date_recv|date_send|date_smaller|" +
+        "date_trunc|datetime_pl|datetimetz_pl|dcbrt|decode|degrees|dense_rank|dexp|diagonal|" +
+        "diameter|dispell_init|dispell_lexize|dist_cpoly|dist_lb|dist_pb|dist_pc|dist_pl|" +
+        "dist_ppath|dist_ps|dist_sb|dist_sl|div|dlog1|dlog10|domain_in|domain_recv|dpow|dround|" +
+        "dsimple_init|dsimple_lexize|dsnowball_init|dsnowball_lexize|dsqrt|dsynonym_init|" +
+        "dsynonym_lexize|dtrunc|encode|enum_cmp|enum_eq|enum_first|enum_ge|enum_gt|enum_in|" +
+        "enum_larger|enum_last|enum_le|enum_lt|enum_ne|enum_out|enum_range|enum_recv|enum_send|" +
+        "enum_smaller|eqjoinsel|eqsel|euc_cn_to_mic|euc_cn_to_utf8|" +
+        "euc_jis_2004_to_shift_jis_2004|euc_jis_2004_to_utf8|euc_jp_to_mic|euc_jp_to_sjis|" +
+        "euc_jp_to_utf8|euc_kr_to_mic|euc_kr_to_utf8|euc_tw_to_big5|euc_tw_to_mic|" +
+        "euc_tw_to_utf8|every|exp|factorial|family|fdw_handler_in|fdw_handler_out|first_value|" +
+        "float4|float48div|float48eq|float48ge|float48gt|float48le|float48lt|float48mi|float48mul|" +
+        "float48ne|float48pl|float4_accum|float4abs|float4div|float4eq|float4ge|float4gt|float4in|" +
+        "float4larger|float4le|float4lt|float4mi|float4mul|float4ne|float4out|float4pl|float4recv|" +
+        "float4send|float4smaller|float4um|float4up|float8|float84div|float84eq|float84ge|" +
+        "float84gt|float84le|float84lt|float84mi|float84mul|float84ne|float84pl|float8_accum|" +
+        "float8_avg|float8_corr|float8_covar_pop|float8_covar_samp|float8_regr_accum|" +
+        "float8_regr_avgx|float8_regr_avgy|float8_regr_intercept|float8_regr_r2|" +
+        "float8_regr_slope|float8_regr_sxx|float8_regr_sxy|float8_regr_syy|float8_stddev_pop|" +
+        "float8_stddev_samp|float8_var_pop|float8_var_samp|float8abs|float8div|float8eq|" +
+        "float8ge|float8gt|float8in|float8larger|float8le|float8lt|float8mi|float8mul|float8ne|" +
+        "float8out|float8pl|float8recv|float8send|float8smaller|float8um|float8up|floor|" +
+        "flt4_mul_cash|flt8_mul_cash|fmgr_c_validator|fmgr_internal_validator|" +
+        "fmgr_sql_validator|format|format_type|gb18030_to_utf8|gbk_to_utf8|generate_series|" +
+        "generate_subscripts|get_bit|get_byte|get_current_ts_config|getdatabaseencoding|" +
+        "getpgusername|gin_cmp_prefix|gin_cmp_tslexeme|gin_extract_tsquery|" +
+        "gin_extract_tsvector|gin_tsquery_consistent|ginarrayconsistent|ginarrayextract|" +
+        "ginbeginscan|ginbuild|ginbuildempty|ginbulkdelete|gincostestimate|ginendscan|" +
+        "gingetbitmap|gininsert|ginmarkpos|ginoptions|ginqueryarrayextract|ginrescan|" +
+        "ginrestrpos|ginvacuumcleanup|gist_box_compress|gist_box_consistent|" +
+        "gist_box_decompress|gist_box_penalty|gist_box_picksplit|gist_box_same|gist_box_union|" +
+        "gist_circle_compress|gist_circle_consistent|gist_point_compress|" +
+        "gist_point_consistent|gist_point_distance|gist_poly_compress|gist_poly_consistent|" +
+        "gistbeginscan|gistbuild|gistbuildempty|gistbulkdelete|gistcostestimate|gistendscan|" +
+        "gistgetbitmap|gistgettuple|gistinsert|gistmarkpos|gistoptions|gistrescan|gistrestrpos|" +
+        "gistvacuumcleanup|gtsquery_compress|gtsquery_consistent|gtsquery_decompress|" +
+        "gtsquery_penalty|gtsquery_picksplit|gtsquery_same|gtsquery_union|gtsvector_compress|" +
+        "gtsvector_consistent|gtsvector_decompress|gtsvector_penalty|gtsvector_picksplit|" +
+        "gtsvector_same|gtsvector_union|gtsvectorin|gtsvectorout|has_any_column_privilege|" +
+        "has_column_privilege|has_database_privilege|has_foreign_data_wrapper_privilege|" +
+        "has_function_privilege|has_language_privilege|has_schema_privilege|" +
+        "has_sequence_privilege|has_server_privilege|has_table_privilege|" +
+        "has_tablespace_privilege|hash_aclitem|hash_array|hash_numeric|hashbeginscan|" +
+        "hashbpchar|hashbuild|hashbuildempty|hashbulkdelete|hashchar|hashcostestimate|" +
+        "hashendscan|hashenum|hashfloat4|hashfloat8|hashgetbitmap|hashgettuple|hashinet|" +
+        "hashinsert|hashint2|hashint2vector|hashint4|hashint8|hashmacaddr|hashmarkpos|hashname|" +
+        "hashoid|hashoidvector|hashoptions|hashrescan|hashrestrpos|hashtext|hashvacuumcleanup|" +
+        "hashvarlena|height|host|hostmask|iclikejoinsel|iclikesel|icnlikejoinsel|icnlikesel|" +
+        "icregexeqjoinsel|icregexeqsel|icregexnejoinsel|icregexnesel|inet_client_addr|" +
+        "inet_client_port|inet_in|inet_out|inet_recv|inet_send|inet_server_addr|" +
+        "inet_server_port|inetand|inetmi|inetmi_int8|inetnot|inetor|inetpl|initcap|int2|int24div|" +
+        "int24eq|int24ge|int24gt|int24le|int24lt|int24mi|int24mul|int24ne|int24pl|int28div|int28eq|" +
+        "int28ge|int28gt|int28le|int28lt|int28mi|int28mul|int28ne|int28pl|int2_accum|" +
+        "int2_avg_accum|int2_mul_cash|int2_sum|int2abs|int2and|int2div|int2eq|int2ge|int2gt|int2in|" +
+        "int2larger|int2le|int2lt|int2mi|int2mod|int2mul|int2ne|int2not|int2or|int2out|int2pl|" +
+        "int2recv|int2send|int2shl|int2shr|int2smaller|int2um|int2up|int2vectoreq|int2vectorin|" +
+        "int2vectorout|int2vectorrecv|int2vectorsend|int2xor|int4|int42div|int42eq|int42ge|" +
+        "int42gt|int42le|int42lt|int42mi|int42mul|int42ne|int42pl|int48div|int48eq|int48ge|int48gt|" +
+        "int48le|int48lt|int48mi|int48mul|int48ne|int48pl|int4_accum|int4_avg_accum|int4_mul_cash|" +
+        "int4_sum|int4abs|int4and|int4div|int4eq|int4ge|int4gt|int4in|int4inc|int4larger|int4le|" +
+        "int4lt|int4mi|int4mod|int4mul|int4ne|int4not|int4or|int4out|int4pl|int4recv|int4send|" +
+        "int4shl|int4shr|int4smaller|int4um|int4up|int4xor|int8|int82div|int82eq|int82ge|int82gt|" +
+        "int82le|int82lt|int82mi|int82mul|int82ne|int82pl|int84div|int84eq|int84ge|int84gt|int84le|" +
+        "int84lt|int84mi|int84mul|int84ne|int84pl|int8_accum|int8_avg|int8_avg_accum|int8_sum|" +
+        "int8abs|int8and|int8div|int8eq|int8ge|int8gt|int8in|int8inc|int8inc_any|" +
+        "int8inc_float8_float8|int8larger|int8le|int8lt|int8mi|int8mod|int8mul|int8ne|int8not|" +
+        "int8or|int8out|int8pl|int8pl_inet|int8recv|int8send|int8shl|int8shr|int8smaller|int8um|" +
+        "int8up|int8xor|integer_pl_date|inter_lb|inter_sb|inter_sl|internal_in|internal_out|" +
+        "interval_accum|interval_avg|interval_cmp|interval_div|interval_eq|interval_ge|" +
+        "interval_gt|interval_hash|interval_in|interval_larger|interval_le|interval_lt|" +
+        "interval_mi|interval_mul|interval_ne|interval_out|interval_pl|interval_pl_date|" +
+        "interval_pl_time|interval_pl_timestamp|interval_pl_timestamptz|interval_pl_timetz|" +
+        "interval_recv|interval_send|interval_smaller|interval_um|intervaltypmodin|" +
+        "intervaltypmodout|intinterval|isclosed|isfinite|ishorizontal|iso8859_1_to_utf8|" +
+        "iso8859_to_utf8|iso_to_koi8r|iso_to_mic|iso_to_win1251|iso_to_win866|isopen|isparallel|" +
+        "isperp|isvertical|johab_to_utf8|justify_days|justify_hours|justify_interval|" +
+        "koi8r_to_iso|koi8r_to_mic|koi8r_to_utf8|koi8r_to_win1251|koi8r_to_win866|" +
+        "koi8u_to_utf8|lag|language_handler_in|language_handler_out|last_value|lastval|" +
+        "latin1_to_mic|latin2_to_mic|latin2_to_win1250|latin3_to_mic|latin4_to_mic|lead|left|" +
+        "length|like|like_escape|likejoinsel|likesel|line|line_distance|line_eq|line_horizontal|" +
+        "line_in|line_interpt|line_intersect|line_out|line_parallel|line_perp|line_recv|" +
+        "line_send|line_vertical|ln|lo_close|lo_creat|lo_create|lo_export|lo_import|lo_lseek|" +
+        "lo_open|lo_tell|lo_truncate|lo_unlink|log|loread|lower|lowrite|lpad|lseg|lseg_center|" +
+        "lseg_distance|lseg_eq|lseg_ge|lseg_gt|lseg_horizontal|lseg_in|lseg_interpt|" +
+        "lseg_intersect|lseg_le|lseg_length|lseg_lt|lseg_ne|lseg_out|lseg_parallel|lseg_perp|" +
+        "lseg_recv|lseg_send|lseg_vertical|ltrim|macaddr_cmp|macaddr_eq|macaddr_ge|macaddr_gt|" +
+        "macaddr_in|macaddr_le|macaddr_lt|macaddr_ne|macaddr_out|macaddr_recv|macaddr_send|" +
+        "makeaclitem|masklen|max|md5|mic_to_ascii|mic_to_big5|mic_to_euc_cn|mic_to_euc_jp|" +
+        "mic_to_euc_kr|mic_to_euc_tw|mic_to_iso|mic_to_koi8r|mic_to_latin1|mic_to_latin2|" +
+        "mic_to_latin3|mic_to_latin4|mic_to_sjis|mic_to_win1250|mic_to_win1251|mic_to_win866|" +
+        "min|mktinterval|mod|money|mul_d_interval|name|nameeq|namege|namegt|nameiclike|nameicnlike|" +
+        "nameicregexeq|nameicregexne|namein|namele|namelike|namelt|namene|namenlike|nameout|" +
+        "namerecv|nameregexeq|nameregexne|namesend|neqjoinsel|neqsel|netmask|network|network_cmp|" +
+        "network_eq|network_ge|network_gt|network_le|network_lt|network_ne|network_sub|" +
+        "network_subeq|network_sup|network_supeq|nextval|nlikejoinsel|nlikesel|notlike|now|" +
+        "npoints|nth_value|ntile|numeric_abs|numeric_accum|numeric_add|numeric_avg|" +
+        "numeric_avg_accum|numeric_cmp|numeric_div|numeric_div_trunc|numeric_eq|numeric_exp|" +
+        "numeric_fac|numeric_ge|numeric_gt|numeric_in|numeric_inc|numeric_larger|numeric_le|" +
+        "numeric_ln|numeric_log|numeric_lt|numeric_mod|numeric_mul|numeric_ne|numeric_out|" +
+        "numeric_power|numeric_recv|numeric_send|numeric_smaller|numeric_sqrt|" +
+        "numeric_stddev_pop|numeric_stddev_samp|numeric_sub|numeric_uminus|numeric_uplus|" +
+        "numeric_var_pop|numeric_var_samp|numerictypmodin|numerictypmodout|numnode|" +
+        "obj_description|octet_length|oid|oideq|oidge|oidgt|oidin|oidlarger|oidle|oidlt|oidne|oidout|" +
+        "oidrecv|oidsend|oidsmaller|oidvectoreq|oidvectorge|oidvectorgt|oidvectorin|oidvectorle|" +
+        "oidvectorlt|oidvectorne|oidvectorout|oidvectorrecv|oidvectorsend|oidvectortypes|on_pb|" +
+        "on_pl|on_ppath|on_ps|on_sb|on_sl|opaque_in|opaque_out|overlaps|overlay|path|path_add|" +
+        "path_add_pt|path_center|path_contain_pt|path_distance|path_div_pt|path_in|path_inter|" +
+        "path_length|path_mul_pt|path_n_eq|path_n_ge|path_n_gt|path_n_le|path_n_lt|path_npoints|" +
+        "path_out|path_recv|path_send|path_sub_pt|pclose|percent_rank|pg_advisory_lock|" +
+        "pg_advisory_lock_shared|pg_advisory_unlock|pg_advisory_unlock_all|" +
+        "pg_advisory_unlock_shared|pg_advisory_xact_lock|pg_advisory_xact_lock_shared|" +
+        "pg_available_extension_versions|pg_available_extensions|pg_backend_pid|" +
+        "pg_cancel_backend|pg_char_to_encoding|pg_client_encoding|pg_collation_is_visible|" +
+        "pg_column_size|pg_conf_load_time|pg_conversion_is_visible|pg_create_restore_point|" +
+        "pg_current_xlog_insert_location|pg_current_xlog_location|pg_cursor|pg_database_size|" +
+        "pg_describe_object|pg_encoding_max_length|pg_encoding_to_char|" +
+        "pg_extension_config_dump|pg_extension_update_paths|pg_function_is_visible|" +
+        "pg_get_constraintdef|pg_get_expr|pg_get_function_arguments|" +
+        "pg_get_function_identity_arguments|pg_get_function_result|pg_get_functiondef|" +
+        "pg_get_indexdef|pg_get_keywords|pg_get_ruledef|pg_get_serial_sequence|" +
+        "pg_get_triggerdef|pg_get_userbyid|pg_get_viewdef|pg_has_role|pg_indexes_size|" +
+        "pg_is_in_recovery|pg_is_other_temp_schema|pg_is_xlog_replay_paused|" +
+        "pg_last_xact_replay_timestamp|pg_last_xlog_receive_location|" +
+        "pg_last_xlog_replay_location|pg_listening_channels|pg_lock_status|pg_ls_dir|" +
+        "pg_my_temp_schema|pg_node_tree_in|pg_node_tree_out|pg_node_tree_recv|" +
+        "pg_node_tree_send|pg_notify|pg_opclass_is_visible|pg_operator_is_visible|" +
+        "pg_options_to_table|pg_postmaster_start_time|pg_prepared_statement|pg_prepared_xact|" +
+        "pg_read_binary_file|pg_read_file|pg_relation_filenode|pg_relation_filepath|" +
+        "pg_relation_size|pg_reload_conf|pg_rotate_logfile|pg_sequence_parameters|" +
+        "pg_show_all_settings|pg_size_pretty|pg_sleep|pg_start_backup|pg_stat_clear_snapshot|" +
+        "pg_stat_file|pg_stat_get_activity|pg_stat_get_analyze_count|" +
+        "pg_stat_get_autoanalyze_count|pg_stat_get_autovacuum_count|" +
+        "pg_stat_get_backend_activity|pg_stat_get_backend_activity_start|" +
+        "pg_stat_get_backend_client_addr|pg_stat_get_backend_client_port|" +
+        "pg_stat_get_backend_dbid|pg_stat_get_backend_idset|pg_stat_get_backend_pid|" +
+        "pg_stat_get_backend_start|pg_stat_get_backend_userid|pg_stat_get_backend_waiting|" +
+        "pg_stat_get_backend_xact_start|pg_stat_get_bgwriter_buf_written_checkpoints|" +
+        "pg_stat_get_bgwriter_buf_written_clean|pg_stat_get_bgwriter_maxwritten_clean|" +
+        "pg_stat_get_bgwriter_requested_checkpoints|pg_stat_get_bgwriter_stat_reset_time|" +
+        "pg_stat_get_bgwriter_timed_checkpoints|pg_stat_get_blocks_fetched|" +
+        "pg_stat_get_blocks_hit|pg_stat_get_buf_alloc|pg_stat_get_buf_fsync_backend|" +
+        "pg_stat_get_buf_written_backend|pg_stat_get_db_blocks_fetched|" +
+        "pg_stat_get_db_blocks_hit|pg_stat_get_db_conflict_all|" +
+        "pg_stat_get_db_conflict_bufferpin|pg_stat_get_db_conflict_lock|" +
+        "pg_stat_get_db_conflict_snapshot|pg_stat_get_db_conflict_startup_deadlock|" +
+        "pg_stat_get_db_conflict_tablespace|pg_stat_get_db_numbackends|" +
+        "pg_stat_get_db_stat_reset_time|pg_stat_get_db_tuples_deleted|" +
+        "pg_stat_get_db_tuples_fetched|pg_stat_get_db_tuples_inserted|" +
+        "pg_stat_get_db_tuples_returned|pg_stat_get_db_tuples_updated|" +
+        "pg_stat_get_db_xact_commit|pg_stat_get_db_xact_rollback|pg_stat_get_dead_tuples|" +
+        "pg_stat_get_function_calls|pg_stat_get_function_self_time|" +
+        "pg_stat_get_function_time|pg_stat_get_last_analyze_time|" +
+        "pg_stat_get_last_autoanalyze_time|pg_stat_get_last_autovacuum_time|" +
+        "pg_stat_get_last_vacuum_time|pg_stat_get_live_tuples|pg_stat_get_numscans|" +
+        "pg_stat_get_tuples_deleted|pg_stat_get_tuples_fetched|" +
+        "pg_stat_get_tuples_hot_updated|pg_stat_get_tuples_inserted|" +
+        "pg_stat_get_tuples_returned|pg_stat_get_tuples_updated|pg_stat_get_vacuum_count|" +
+        "pg_stat_get_wal_senders|pg_stat_get_xact_blocks_fetched|" +
+        "pg_stat_get_xact_blocks_hit|pg_stat_get_xact_function_calls|" +
+        "pg_stat_get_xact_function_self_time|pg_stat_get_xact_function_time|" +
+        "pg_stat_get_xact_numscans|pg_stat_get_xact_tuples_deleted|" +
+        "pg_stat_get_xact_tuples_fetched|pg_stat_get_xact_tuples_hot_updated|" +
+        "pg_stat_get_xact_tuples_inserted|pg_stat_get_xact_tuples_returned|" +
+        "pg_stat_get_xact_tuples_updated|pg_stat_reset|pg_stat_reset_shared|" +
+        "pg_stat_reset_single_function_counters|pg_stat_reset_single_table_counters|" +
+        "pg_stop_backup|pg_switch_xlog|pg_table_is_visible|pg_table_size|" +
+        "pg_tablespace_databases|pg_tablespace_size|pg_terminate_backend|pg_timezone_abbrevs|" +
+        "pg_timezone_names|pg_total_relation_size|pg_try_advisory_lock|" +
+        "pg_try_advisory_lock_shared|pg_try_advisory_xact_lock|" +
+        "pg_try_advisory_xact_lock_shared|pg_ts_config_is_visible|pg_ts_dict_is_visible|" +
+        "pg_ts_parser_is_visible|pg_ts_template_is_visible|pg_type_is_visible|pg_typeof|" +
+        "pg_xlog_replay_pause|pg_xlog_replay_resume|pg_xlogfile_name|pg_xlogfile_name_offset|" +
+        "pi|plainto_tsquery|plpgsql_call_handler|plpgsql_inline_handler|plpgsql_validator|" +
+        "point|point_above|point_add|point_below|point_distance|point_div|point_eq|point_horiz|" +
+        "point_in|point_left|point_mul|point_ne|point_out|point_recv|point_right|point_send|" +
+        "point_sub|point_vert|poly_above|poly_below|poly_center|poly_contain|poly_contain_pt|" +
+        "poly_contained|poly_distance|poly_in|poly_left|poly_npoints|poly_out|poly_overabove|" +
+        "poly_overbelow|poly_overlap|poly_overleft|poly_overright|poly_recv|poly_right|" +
+        "poly_same|poly_send|polygon|popen|position|positionjoinsel|positionsel|" +
+        "postgresql_fdw_validator|pow|power|prsd_end|prsd_headline|prsd_lextype|prsd_nexttoken|" +
+        "prsd_start|pt_contained_circle|pt_contained_poly|query_to_xml|" +
+        "query_to_xml_and_xmlschema|query_to_xmlschema|querytree|quote_ident|quote_literal|" +
+        "quote_nullable|radians|radius|random|rank|record_eq|record_ge|record_gt|record_in|" +
+        "record_le|record_lt|record_ne|record_out|record_recv|record_send|regclass|regclassin|" +
+        "regclassout|regclassrecv|regclasssend|regconfigin|regconfigout|regconfigrecv|" +
+        "regconfigsend|regdictionaryin|regdictionaryout|regdictionaryrecv|regdictionarysend|" +
+        "regexeqjoinsel|regexeqsel|regexnejoinsel|regexnesel|regexp_matches|regexp_replace|" +
+        "regexp_split_to_array|regexp_split_to_table|regoperatorin|regoperatorout|" +
+        "regoperatorrecv|regoperatorsend|regoperin|regoperout|regoperrecv|regopersend|" +
+        "regprocedurein|regprocedureout|regprocedurerecv|regproceduresend|regprocin|regprocout|" +
+        "regprocrecv|regprocsend|regr_avgx|regr_avgy|regr_count|regr_intercept|regr_r2|" +
+        "regr_slope|regr_sxx|regr_sxy|regr_syy|regtypein|regtypeout|regtyperecv|regtypesend|" +
+        "reltime|reltimeeq|reltimege|reltimegt|reltimein|reltimele|reltimelt|reltimene|reltimeout|" +
+        "reltimerecv|reltimesend|repeat|replace|reverse|right|round|row_number|rpad|rtrim|" +
+        "scalargtjoinsel|scalargtsel|scalarltjoinsel|scalarltsel|schema_to_xml|" +
+        "schema_to_xml_and_xmlschema|schema_to_xmlschema|session_user|set_bit|set_byte|" +
+        "set_config|set_masklen|setseed|setval|setweight|shell_in|shell_out|" +
+        "shift_jis_2004_to_euc_jis_2004|shift_jis_2004_to_utf8|shobj_description|sign|" +
+        "similar_escape|sin|sjis_to_euc_jp|sjis_to_mic|sjis_to_utf8|slope|smgreq|smgrin|smgrne|" +
+        "smgrout|split_part|sqrt|statement_timestamp|stddev|stddev_pop|stddev_samp|string_agg|" +
+        "string_agg_finalfn|string_agg_transfn|string_to_array|strip|strpos|substr|substring|sum|" +
+        "suppress_redundant_updates_trigger|table_to_xml|table_to_xml_and_xmlschema|" +
+        "table_to_xmlschema|tan|text|text_ge|text_gt|text_larger|text_le|text_lt|text_pattern_ge|" +
+        "text_pattern_gt|text_pattern_le|text_pattern_lt|text_smaller|textanycat|textcat|texteq|" +
+        "texticlike|texticnlike|texticregexeq|texticregexne|textin|textlen|textlike|textne|" +
+        "textnlike|textout|textrecv|textregexeq|textregexne|textsend|thesaurus_init|" +
+        "thesaurus_lexize|tideq|tidge|tidgt|tidin|tidlarger|tidle|tidlt|tidne|tidout|tidrecv|tidsend|" +
+        "tidsmaller|time_cmp|time_eq|time_ge|time_gt|time_hash|time_in|time_larger|time_le|time_lt|" +
+        "time_mi_interval|time_mi_time|time_ne|time_out|time_pl_interval|time_recv|time_send|" +
+        "time_smaller|timedate_pl|timemi|timenow|timeofday|timepl|timestamp_cmp|" +
+        "timestamp_cmp_date|timestamp_cmp_timestamptz|timestamp_eq|timestamp_eq_date|" +
+        "timestamp_eq_timestamptz|timestamp_ge|timestamp_ge_date|timestamp_ge_timestamptz|" +
+        "timestamp_gt|timestamp_gt_date|timestamp_gt_timestamptz|timestamp_hash|timestamp_in|" +
+        "timestamp_larger|timestamp_le|timestamp_le_date|timestamp_le_timestamptz|" +
+        "timestamp_lt|timestamp_lt_date|timestamp_lt_timestamptz|timestamp_mi|" +
+        "timestamp_mi_interval|timestamp_ne|timestamp_ne_date|timestamp_ne_timestamptz|" +
+        "timestamp_out|timestamp_pl_interval|timestamp_recv|timestamp_send|timestamp_smaller|" +
+        "timestamptypmodin|timestamptypmodout|timestamptz_cmp|timestamptz_cmp_date|" +
+        "timestamptz_cmp_timestamp|timestamptz_eq|timestamptz_eq_date|" +
+        "timestamptz_eq_timestamp|timestamptz_ge|timestamptz_ge_date|" +
+        "timestamptz_ge_timestamp|timestamptz_gt|timestamptz_gt_date|" +
+        "timestamptz_gt_timestamp|timestamptz_in|timestamptz_larger|timestamptz_le|" +
+        "timestamptz_le_date|timestamptz_le_timestamp|timestamptz_lt|timestamptz_lt_date|" +
+        "timestamptz_lt_timestamp|timestamptz_mi|timestamptz_mi_interval|timestamptz_ne|" +
+        "timestamptz_ne_date|timestamptz_ne_timestamp|timestamptz_out|" +
+        "timestamptz_pl_interval|timestamptz_recv|timestamptz_send|timestamptz_smaller|" +
+        "timestamptztypmodin|timestamptztypmodout|timetypmodin|timetypmodout|timetz_cmp|" +
+        "timetz_eq|timetz_ge|timetz_gt|timetz_hash|timetz_in|timetz_larger|timetz_le|timetz_lt|" +
+        "timetz_mi_interval|timetz_ne|timetz_out|timetz_pl_interval|timetz_recv|timetz_send|" +
+        "timetz_smaller|timetzdate_pl|timetztypmodin|timetztypmodout|timezone|tinterval|" +
+        "tintervalct|tintervalend|tintervaleq|tintervalge|tintervalgt|tintervalin|tintervalle|" +
+        "tintervalleneq|tintervallenge|tintervallengt|tintervallenle|tintervallenlt|" +
+        "tintervallenne|tintervallt|tintervalne|tintervalout|tintervalov|tintervalrecv|" +
+        "tintervalrel|tintervalsame|tintervalsend|tintervalstart|to_ascii|to_char|to_date|to_hex|" +
+        "to_number|to_timestamp|to_tsquery|to_tsvector|transaction_timestamp|translate|" +
+        "trigger_in|trigger_out|trunc|ts_debug|ts_headline|ts_lexize|ts_match_qv|ts_match_tq|" +
+        "ts_match_tt|ts_match_vq|ts_parse|ts_rank|ts_rank_cd|ts_rewrite|ts_stat|ts_token_type|" +
+        "ts_typanalyze|tsmatchjoinsel|tsmatchsel|tsq_mcontained|tsq_mcontains|tsquery_and|" +
+        "tsquery_cmp|tsquery_eq|tsquery_ge|tsquery_gt|tsquery_le|tsquery_lt|tsquery_ne|" +
+        "tsquery_not|tsquery_or|tsqueryin|tsqueryout|tsqueryrecv|tsquerysend|tsvector_cmp|" +
+        "tsvector_concat|tsvector_eq|tsvector_ge|tsvector_gt|tsvector_le|tsvector_lt|" +
+        "tsvector_ne|tsvector_update_trigger|tsvector_update_trigger_column|tsvectorin|" +
+        "tsvectorout|tsvectorrecv|tsvectorsend|txid_current|txid_current_snapshot|" +
+        "txid_snapshot_in|txid_snapshot_out|txid_snapshot_recv|txid_snapshot_send|" +
+        "txid_snapshot_xip|txid_snapshot_xmax|txid_snapshot_xmin|txid_visible_in_snapshot|" +
+        "uhc_to_utf8|unique_key_recheck|unknownin|unknownout|unknownrecv|unknownsend|unnest|" +
+        "upper|utf8_to_ascii|utf8_to_big5|utf8_to_euc_cn|utf8_to_euc_jis_2004|utf8_to_euc_jp|" +
+        "utf8_to_euc_kr|utf8_to_euc_tw|utf8_to_gb18030|utf8_to_gbk|utf8_to_iso8859|" +
+        "utf8_to_iso8859_1|utf8_to_johab|utf8_to_koi8r|utf8_to_koi8u|utf8_to_shift_jis_2004|" +
+        "utf8_to_sjis|utf8_to_uhc|utf8_to_win|uuid_cmp|uuid_eq|uuid_ge|uuid_gt|uuid_hash|uuid_in|" +
+        "uuid_le|uuid_lt|uuid_ne|uuid_out|uuid_recv|uuid_send|var_pop|var_samp|varbit_in|" +
+        "varbit_out|varbit_recv|varbit_send|varbitcmp|varbiteq|varbitge|varbitgt|varbitle|" +
+        "varbitlt|varbitne|varbittypmodin|varbittypmodout|varcharin|varcharout|varcharrecv|" +
+        "varcharsend|varchartypmodin|varchartypmodout|variance|version|void_in|void_out|" +
+        "void_recv|void_send|width|width_bucket|win1250_to_latin2|win1250_to_mic|win1251_to_iso|" +
+        "win1251_to_koi8r|win1251_to_mic|win1251_to_win866|win866_to_iso|win866_to_koi8r|" +
+        "win866_to_mic|win866_to_win1251|win_to_utf8|xideq|xideqint4|xidin|xidout|xidrecv|xidsend|" +
+        "xml|xml_in|xml_is_well_formed|xml_is_well_formed_content|xml_is_well_formed_document|" +
+        "xml_out|xml_recv|xml_send|xmlagg|xmlcomment|xmlconcat2|xmlexists|xmlvalidate|xpath|" +
+        "xpath_exists").split("|")
+    );
+    
+    var sqlRules = [
+        {
+            token : "string", // single line string -- assume dollar strings if multi-line for now
+            regex : "['](?:(?:\\\\.)|(?:[^'\\\\]))*?[']"
+        }, {
+            token : "variable.language", // pg identifier
+            regex : '".*?"'
+        }, {
+            token : "constant.numeric", // float
+            regex : "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
+        }, {
+            token : function(value) {
+                value = value.toLowerCase();
+                if (keywords.hasOwnProperty(value)) {
+                    return "keyword";
+                } else if (builtinFunctions.hasOwnProperty(value)) {
+                    return "support.function";
+                } else {
+                    return "identifier";
+                }
+              },
+              regex : "[a-zA-Z_][a-zA-Z0-9_$]*\\b" // TODO - Unicode in identifiers
+          }, {
+              token : "keyword.operator",
+              regex : "!|!!|!~|!~\\*|!~~|!~~\\*|#|##|#<|#<=|#<>|#=|#>|#>=|%|\\&|\\&\\&|\\&<|\\&<\\||\\&>|\\*|\\+|" +
+                      "\\-|/|<|<#>|<\\->|<<|<<=|<<\\||<=|<>|<\\?>|<@|<\\^|=|>|>=|>>|>>=|>\\^|\\?#|\\?\\-|\\?\\-\\||" +
+                      "\\?\\||\\?\\|\\||@|@\\-@|@>|@@|@@@|\\^|\\||\\|\\&>|\\|/|\\|>>|\\|\\||\\|\\|/|~|~\\*|~<=~|~<~|" +
+                      "~=|~>=~|~>~|~~|~~\\*"
+          }, {
+              token : "lparen.paren",
+              regex : "[\\(]"
+          }, {
+              token : "paren.rparen",
+              regex : "[\\)]"
+          }, {
+              token : "text",
+              regex : "\\s+"
+          }
+    ];
+           
+
+    this.$rules = {
+        "start" : [
+            {
+                token : "comment",
+                regex : "--.*$"
+            }, 
+            new DocCommentHighlightRules().getStartRule("doc-start"),
+            {
+                token : "comment", // multi-line comment
+                merge : true,
+                regex : "\\/\\*",
+                next : "comment"
+            },{
+                token : "keyword.statementBegin",
+                regex : "^[a-zA-Z]+", // Could enumerate starting keywords but this allows things to work when new statements are added.
+                next : "statement"
+            },{
+                token : "support.buildin", // psql directive
+                regex : "^\\\\[\\S]+.*$"
+            }
+        ],
+        
+        "statement" : [
+            {
+                token : "comment",
+                regex : "--.*$"
+            }, {
+                token : "comment", // multi-line comment
+                merge : true,
+                regex : "\\/\\*",
+                next : "commentStatement"
+            }, {
+                token : "statementEnd",
+                regex : ";",
+                next : "start"
+            }, {
+                token : "string", // perl, python, tcl are in the pg default dist (no tcl highlighter)
+                regex : "\\$perl\\$",
+                next : "perl-start"
+            }, {
+                token : "string",
+                regex : "\\$python\\$",
+                next : "python-start"
+            },{
+                token : "string",
+                regex : "\\$[\\w_0-9]*\\$$", // dollar quote at the end of a line
+                next : "dollarSql"
+            }, {
+                token : "string",
+                regex : "\\$[\\w_0-9]*\\$",
+                next : "dollarStatementString"
+            }
+        ].concat(sqlRules),
+        
+        "dollarSql" : [
+            {
+                token : "comment",
+                regex : "--.*$"
+            }, {
+                token : "comment", // multi-line comment
+                merge : true,
+                regex : "\\/\\*",
+                next : "commentDollarSql"
+            }, {
+                token : "string", // end quoting with dollar at the start of a line
+                regex : "^\\$[\\w_0-9]*\\$",
+                next : "statement"
+            }, {
+                token : "string",
+                regex : "\\$[\\w_0-9]*\\$",
+                next : "dollarSqlString"
+            }
+        ].concat(sqlRules),
+        
+        "comment" : [
+            {
+                token : "comment", // closing comment
+                regex : ".*?\\*\\/",
+                next : "start"
+            }, {
+                token : "comment", // comment spanning whole line
+                merge : true,
+                regex : ".+"
+            }
+        ],
+        
+        "commentStatement" : [
+            {
+                token : "comment", // closing comment
+                regex : ".*?\\*\\/",
+                next : "statement"
+            }, {
+                token : "comment", // comment spanning whole line
+                merge : true,
+                regex : ".+"
+            }
+        ],
+        
+        "commentDollarSql" : [
+            {
+                token : "comment", // closing comment
+                regex : ".*?\\*\\/",
+                next : "dollarSql"
+            }, {
+                token : "comment", // comment spanning whole line
+                merge : true,
+                regex : ".+"
+            }
+        ],
+        
+        "dollarStatementString" : [
+            {
+                token : "string", // closing dollarstring
+                regex : ".*?\\$[\\w_0-9]*\\$",
+                next : "statement"
+            }, {
+                token : "string", // dollarstring spanning whole line
+                merge : true,
+                regex : ".+"
+            }
+        ],
+        
+        "dollarSqlString" : [
+            {
+                token : "string", // closing dollarstring
+                regex : ".*?\\$[\\w_0-9]*\\$",
+                next : "dollarSql"
+            }, {
+                token : "string", // dollarstring spanning whole line
+                merge : true,
+                regex : ".+"
+            }
+        ]
+    };
+    
+    this.embedRules(DocCommentHighlightRules, "doc-", [ new DocCommentHighlightRules().getEndRule("start") ]);
+    this.embedRules(PerlHighlightRules, "perl-", [{token : "string", regex : "\\$perl\\$", next : "statement"}]);
+    this.embedRules(PythonHighlightRules, "python-", [{token : "string", regex : "\\$python\\$", next : "statement"}]);
+};
+
+oop.inherits(PgsqlHighlightRules, TextHighlightRules);
+
+exports.PgsqlHighlightRules = PgsqlHighlightRules;
+});
+
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is Ajax.org Code Editor (ACE).
+ *
+ * The Initial Developer of the Original Code is
+ * Ajax.org B.V.
+ * Portions created by the Initial Developer are Copyright (C) 2010
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *      Fabian Jakobs <fabian AT ajax DOT org>
+ *      Colin Gourlay <colin DOT j DOT gourlay AT gmail DOT com>
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK *****
+ *
+ * TODO: python delimiters
+ */
+
+define('ace/mode/python_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
+
+var oop = require("../lib/oop");
+var lang = require("../lib/lang");
+var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+
+var PythonHighlightRules = function() {
+
+    var keywords = lang.arrayToMap(
+        ("and|as|assert|break|class|continue|def|del|elif|else|except|exec|" +
+        "finally|for|from|global|if|import|in|is|lambda|not|or|pass|print|" +
+        "raise|return|try|while|with|yield").split("|")
+    );
+
+    var builtinConstants = lang.arrayToMap(
+        ("True|False|None|NotImplemented|Ellipsis|__debug__").split("|")
+    );
+
+    var builtinFunctions = lang.arrayToMap(
+        ("abs|divmod|input|open|staticmethod|all|enumerate|int|ord|str|any|" +
+        "eval|isinstance|pow|sum|basestring|execfile|issubclass|print|super|" +
+        "binfile|iter|property|tuple|bool|filter|len|range|type|bytearray|" +
+        "float|list|raw_input|unichr|callable|format|locals|reduce|unicode|" +
+        "chr|frozenset|long|reload|vars|classmethod|getattr|map|repr|xrange|" +
+        "cmp|globals|max|reversed|zip|compile|hasattr|memoryview|round|" +
+        "__import__|complex|hash|min|set|apply|delattr|help|next|setattr|" +
+        "buffer|dict|hex|object|slice|coerce|dir|id|oct|sorted|intern").split("|")
+    );
+
+    var futureReserved = lang.arrayToMap(
+        ("").split("|")
+    );
+
+    var strPre = "(?:r|u|ur|R|U|UR|Ur|uR)?";
+
+    var decimalInteger = "(?:(?:[1-9]\\d*)|(?:0))";
+    var octInteger = "(?:0[oO]?[0-7]+)";
+    var hexInteger = "(?:0[xX][\\dA-Fa-f]+)";
+    var binInteger = "(?:0[bB][01]+)";
+    var integer = "(?:" + decimalInteger + "|" + octInteger + "|" + hexInteger + "|" + binInteger + ")";
+
+    var exponent = "(?:[eE][+-]?\\d+)";
+    var fraction = "(?:\\.\\d+)";
+    var intPart = "(?:\\d+)";
+    var pointFloat = "(?:(?:" + intPart + "?" + fraction + ")|(?:" + intPart + "\\.))";
+    var exponentFloat = "(?:(?:" + pointFloat + "|" +  intPart + ")" + exponent + ")";
+    var floatNumber = "(?:" + exponentFloat + "|" + pointFloat + ")";
+
+    this.$rules = {
+        "start" : [ {
+            token : "comment",
+            regex : "#.*$"
+        }, {
+            token : "string",           // """ string
+            regex : strPre + '"{3}(?:[^\\\\]|\\\\.)*?"{3}'
+        }, {
+            token : "string",           // multi line """ string start
+            merge : true,
+            regex : strPre + '"{3}.*$',
+            next : "qqstring"
+        }, {
+            token : "string",           // " string
+            regex : strPre + '"(?:[^\\\\]|\\\\.)*?"'
+        }, {
+            token : "string",           // ''' string
+            regex : strPre + "'{3}(?:[^\\\\]|\\\\.)*?'{3}"
+        }, {
+            token : "string",           // multi line ''' string start
+            merge : true,
+            regex : strPre + "'{3}.*$",
+            next : "qstring"
+        }, {
+            token : "string",           // ' string
+            regex : strPre + "'(?:[^\\\\]|\\\\.)*?'"
+        }, {
+            token : "constant.numeric", // imaginary
+            regex : "(?:" + floatNumber + "|\\d+)[jJ]\\b"
+        }, {
+            token : "constant.numeric", // float
+            regex : floatNumber
+        }, {
+            token : "constant.numeric", // long integer
+            regex : integer + "[lL]\\b"
+        }, {
+            token : "constant.numeric", // integer
+            regex : integer + "\\b"
+        }, {
+            token : function(value) {
+                if (keywords.hasOwnProperty(value))
+                    return "keyword";
+                else if (builtinConstants.hasOwnProperty(value))
+                    return "constant.language";
+                else if (futureReserved.hasOwnProperty(value))
+                    return "invalid.illegal";
+                else if (builtinFunctions.hasOwnProperty(value))
+                    return "support.function";
+                else if (value == "debugger")
+                    return "invalid.deprecated";
+                else
+                    return "identifier";
+            },
+            regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+        }, {
+            token : "keyword.operator",
+            regex : "\\+|\\-|\\*|\\*\\*|\\/|\\/\\/|%|<<|>>|&|\\||\\^|~|<|>|<=|=>|==|!=|<>|="
+        }, {
+            token : "lparen.paren",
+            regex : "[\\[\\(\\{]"
+        }, {
+            token : "paren.rparen",
+            regex : "[\\]\\)\\}]"
+        }, {
+            token : "text",
+            regex : "\\s+"
+        } ],
+        "qqstring" : [ {
+            token : "string", // multi line """ string end
+            regex : '(?:[^\\\\]|\\\\.)*?"{3}',
+            next : "start"
+        }, {
+            token : "string",
+            merge : true,
+            regex : '.+'
+        } ],
+        "qstring" : [ {
+            token : "string",  // multi line ''' string end
+            regex : "(?:[^\\\\]|\\\\.)*?'{3}",
+            next : "start"
+        }, {
+            token : "string",
+            merge : true,
+            regex : '.+'
+        } ]
+    };
+};
+
+oop.inherits(PythonHighlightRules, TextHighlightRules);
+
+exports.PythonHighlightRules = PythonHighlightRules;
+});
+/* ***** BEGIN LICENSE BLOCK *****
 * Version: MPL 1.1/GPL 2.0/LGPL 2.1
 *
 * The contents of this file are subject to the Mozilla Public License Version
@@ -15953,6 +17029,7 @@ exports.PerlHighlightRules = PerlHighlightRules;
 * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/php', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/php_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/range', 'ace/mode/behaviour/cstyle', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -16072,6 +17149,7 @@ exports.Mode = Mode;
  */
 
 define('ace/mode/php_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -16079,6 +17157,7 @@ var DocCommentHighlightRules = require("./doc_comment_highlight_rules").DocComme
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
 var PhpHighlightRules = function() {
+    var docComment = new DocCommentHighlightRules();
     // http://php.net/quickref.php
     var builtinFunctions = lang.arrayToMap(
         ('abs|acos|acosh|addcslashes|addslashes|aggregate|aggregate_info|aggregate_methods|aggregate_methods_by_list|aggregate_methods_by_regexp|' +
@@ -16938,12 +18017,31 @@ var PhpHighlightRules = function() {
     this.$rules = {
         "start" : [
             {
-                token : "support", // php open tag
+                token : "support.php_tag", // php open tag
                 regex : "<\\?(?:php|\\=)"
             },
             {
-                token : "support", // php close tag
+                token : "support.php_tag", // php close tag
                 regex : "\\?>"
+            },
+            {
+                token : "comment",
+                regex : "<\\!--",
+                next : "htmlcomment"
+            }, 
+            {
+                token : "meta.tag",
+                regex : "<style",
+                next : "css"
+            },
+            {
+                token : "meta.tag", // opening tag
+                regex : "<\\/?[-_a-zA-Z0-9:]+",
+                next : "htmltag"
+            },
+            {
+                token : 'meta.tag',
+                regex : '<\!DOCTYPE.*?>'
             },
             {
                 token : "comment",
@@ -16953,10 +18051,9 @@ var PhpHighlightRules = function() {
                token : "comment",
                regex : "#.*$"
             },
-            new DocCommentHighlightRules().getStartRule("doc-start"),
+            docComment.getStartRule("doc-start"),
             {
                 token : "comment", // multi line comment
-                merge : true,
                 regex : "\\/\\*",
                 next : "comment"
             }, {
@@ -16967,7 +18064,6 @@ var PhpHighlightRules = function() {
                 regex : '["](?:(?:\\\\.)|(?:[^"\\\\]))*?["]'
             }, {
                 token : "string", // multi line string start
-                merge : true,
                 regex : '["].*\\\\$',
                 next : "qqstring"
             }, {
@@ -16975,7 +18071,6 @@ var PhpHighlightRules = function() {
                 regex : "['](?:(?:\\\\.)|(?:[^'\\\\]))*?[']"
             }, {
                 token : "string", // multi line string start
-                merge : true,
                 regex : "['].*\\\\$",
                 next : "qstring"
             }, {
@@ -17011,11 +18106,7 @@ var PhpHighlightRules = function() {
                         "T(?:HOUS(?:ANDS_SEP|EP)|_FMT(?:_AMPM|))|YES(?:EXPR|STR)|STD(?:IN|OUT|ERR))\\b"
             }, {
                 token : function(value) {
-                    if (keywordsDeprecated.hasOwnProperty(value))
-                        return "invalid.deprecated";
-                    else if (keywords.hasOwnProperty(value))
-                        return "keyword";
-                    else if (languageConstructs.hasOwnProperty(value))
+                    if (keywords.hasOwnProperty(value))
                         return "keyword";
                     else if (builtinConstants.hasOwnProperty(value))
                         return "constant.language";
@@ -17023,12 +18114,12 @@ var PhpHighlightRules = function() {
                         return "variable.language";
                     else if (futureReserved.hasOwnProperty(value))
                         return "invalid.illegal";
-                    else if (builtinFunctionsDeprecated.hasOwnProperty(value))
-                        return "invalid.deprecated";
                     else if (builtinFunctions.hasOwnProperty(value))
                         return "support.function";
+                    else if (value == "debugger")
+                        return "invalid.deprecated";
                     else
-                        if(value.match(/^(\$[a-zA-Z_][a-zA-Z0-9_]*|self|parent)$/))
+                        if(value.match(/^(\$[a-zA-Z][a-zA-Z0-9_]*|self|parent)$/))
                             return "variable";
                         return "identifier";
                 },
@@ -17039,10 +18130,10 @@ var PhpHighlightRules = function() {
                 token : "keyword.operator",
                 regex : "!|\\$|%|&|\\*|\\-\\-|\\-|\\+\\+|\\+|~|===|==|=|!=|!==|<=|>=|<<=|>>=|>>>=|<>|<|>|!|&&|\\|\\||\\?\\:|\\*=|%=|\\+=|\\-=|&=|\\^=|\\b(?:in|instanceof|new|delete|typeof|void)"
             }, {
-                token : "paren.lparen",
+                token : "lparen",
                 regex : "[[({]"
             }, {
-                token : "paren.rparen",
+                token : "rparen",
                 regex : "[\\])}]"
             }, {
                 token : "text",
@@ -17056,7 +18147,6 @@ var PhpHighlightRules = function() {
                 next : "start"
             }, {
                 token : "comment", // comment spanning whole line
-                merge : true,
                 regex : ".+"
             }
         ],
@@ -17067,7 +18157,6 @@ var PhpHighlightRules = function() {
                 next : "start"
             }, {
                 token : "string",
-                merge : true,
                 regex : '.+'
             }
         ],
@@ -17078,10 +18167,98 @@ var PhpHighlightRules = function() {
                 next : "start"
             }, {
                 token : "string",
-                merge : true,
                 regex : '.+'
             }
-        ]
+        ],
+        "htmlcomment" : [
+             {
+                 token : "comment",
+                 regex : ".*?-->",
+                 next : "start"
+             }, {
+                 token : "comment",
+                 regex : ".+"
+             } 
+         ],
+         "htmltag" : [ 
+             {
+                 token : "meta.tag",
+                 regex : ">",
+                 next : "start"
+             }, {
+                 token : "text",
+                 regex : "[-_a-zA-Z0-9:]+"
+             }, {
+                 token : "text",
+                 regex : "\\s+"
+             }, {
+                 token : "string",
+                 regex : '".*?"'
+             }, {
+                 token : "string",
+                 regex : "'.*?'"
+             } 
+         ],
+        "css" : [ 
+             {
+                 token : "meta.tag",
+                 regex : "<\/style>",
+                 next : "htmltag"
+             }, {
+                 token : "meta.tag",
+                 regex : ">",
+             }, {
+                 token : 'text',
+                 regex : "(?:media|type|href)"
+             }, {
+                 token : 'string',
+                 regex : '=".*?"'
+             }, {
+                 token : "paren.lparen",
+                 regex : "\{",
+                 next : "cssdeclaration",
+             }, {
+                 token : "keyword",
+                 regex : "#[A-Za-z0-9\-\_\.]+"
+             }, {
+                 token : "variable",
+                 regex : "\\.[A-Za-z0-9\-\_\.]+"
+             }, {
+                 token : "constant",
+                 regex : "[A-Za-z0-9]+"
+             }
+         ],
+         "cssdeclaration" : [
+             {
+                 token : "support.type",
+                 regex : "[\-a-zA-Z]+",
+                 next  : "cssvalue"
+             }, 
+             {
+                 token : "paren.rparen",
+                 regex : '\}',
+                 next : "css"
+             }
+         ],
+         "cssvalue" : [
+               {
+                   token : "text",
+                   regex : "\:"
+               }, 
+               {
+                   token : "constant",
+                   regex : "#[0-9a-zA-Z]+"
+               },
+               {
+                   token : "text",
+                   regex : "[\-\_0-9a-zA-Z\"' ,%]+"
+               },
+               {
+                   token : "text",
+                   regex : ";",
+                   next : "cssdeclaration"
+               }
+         ],
     };
 
     this.embedRules(DocCommentHighlightRules, "doc-",
@@ -17093,6 +18270,7 @@ oop.inherits(PhpHighlightRules, TextHighlightRules);
 exports.PhpHighlightRules = PhpHighlightRules;
 });
 define('ace/mode/powershell', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/powershell_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/mode/behaviour/cstyle', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -17149,11 +18327,11 @@ oop.inherits(Mode, TextMode);
 
 exports.Mode = Mode;
 });
-define('ace/mode/powershell_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+define('ace/mode/powershell_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
-var DocCommentHighlightRules = require("./doc_comment_highlight_rules").DocCommentHighlightRules;
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
 var PowershellHighlightRules = function() {
@@ -17325,18 +18503,19 @@ exports.PowershellHighlightRules = PowershellHighlightRules;
 *
 * ***** END LICENSE BLOCK ***** */
 
-define('ace/mode/python', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/python_highlight_rules', 'ace/mode/folding/python', 'ace/range'], function(require, exports, module) {
+define('ace/mode/python', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/python_highlight_rules', 'ace/mode/folding/pythonic', 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
 var Tokenizer = require("../tokenizer").Tokenizer;
 var PythonHighlightRules = require("./python_highlight_rules").PythonHighlightRules;
-var PythonFoldMode = require("./folding/python").FoldMode;
+var PythonFoldMode = require("./folding/pythonic").FoldMode;
 var Range = require("../range").Range;
 
 var Mode = function() {
     this.$tokenizer = new Tokenizer(new PythonHighlightRules().getRules());
-    this.foldingRules = new PythonFoldMode();
+    this.foldingRules = new PythonFoldMode("\\:");
 };
 oop.inherits(Mode, TextMode);
 
@@ -17433,240 +18612,8 @@ oop.inherits(Mode, TextMode);
 
 exports.Mode = Mode;
 });
-/* ***** BEGIN LICENSE BLOCK *****
- * Version: MPL 1.1/GPL 2.0/LGPL 2.1
- *
- * The contents of this file are subject to the Mozilla Public License Version
- * 1.1 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
- *
- * The Original Code is Ajax.org Code Editor (ACE).
- *
- * The Initial Developer of the Original Code is
- * Ajax.org B.V.
- * Portions created by the Initial Developer are Copyright (C) 2010
- * the Initial Developer. All Rights Reserved.
- *
- * Contributor(s):
- *      Fabian Jakobs <fabian AT ajax DOT org>
- *      Colin Gourlay <colin DOT j DOT gourlay AT gmail DOT com>
- *
- * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
- * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
- * use your version of this file under the terms of the MPL, indicate your
- * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
- * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the MPL, the GPL or the LGPL.
- *
- * ***** END LICENSE BLOCK *****
- *
- * TODO: python delimiters
- */
-
-define('ace/mode/python_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
-
-var oop = require("../lib/oop");
-var lang = require("../lib/lang");
-var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
-
-var PythonHighlightRules = function() {
-
-    var keywords = lang.arrayToMap(
-        ("and|as|assert|break|class|continue|def|del|elif|else|except|exec|" +
-        "finally|for|from|global|if|import|in|is|lambda|not|or|pass|print|" +
-        "raise|return|try|while|with|yield").split("|")
-    );
-
-    var builtinConstants = lang.arrayToMap(
-        ("True|False|None|NotImplemented|Ellipsis|__debug__").split("|")
-    );
-
-    var builtinFunctions = lang.arrayToMap(
-        ("abs|divmod|input|open|staticmethod|all|enumerate|int|ord|str|any|" +
-        "eval|isinstance|pow|sum|basestring|execfile|issubclass|print|super|" +
-        "binfile|iter|property|tuple|bool|filter|len|range|type|bytearray|" +
-        "float|list|raw_input|unichr|callable|format|locals|reduce|unicode|" +
-        "chr|frozenset|long|reload|vars|classmethod|getattr|map|repr|xrange|" +
-        "cmp|globals|max|reversed|zip|compile|hasattr|memoryview|round|" +
-        "__import__|complex|hash|min|set|apply|delattr|help|next|setattr|" +
-        "buffer|dict|hex|object|slice|coerce|dir|id|oct|sorted|intern").split("|")
-    );
-
-    var futureReserved = lang.arrayToMap(
-        ("").split("|")
-    );
-
-    var strPre = "(?:r|u|ur|R|U|UR|Ur|uR)?";
-
-    var decimalInteger = "(?:(?:[1-9]\\d*)|(?:0))";
-    var octInteger = "(?:0[oO]?[0-7]+)";
-    var hexInteger = "(?:0[xX][\\dA-Fa-f]+)";
-    var binInteger = "(?:0[bB][01]+)";
-    var integer = "(?:" + decimalInteger + "|" + octInteger + "|" + hexInteger + "|" + binInteger + ")";
-
-    var exponent = "(?:[eE][+-]?\\d+)";
-    var fraction = "(?:\\.\\d+)";
-    var intPart = "(?:\\d+)";
-    var pointFloat = "(?:(?:" + intPart + "?" + fraction + ")|(?:" + intPart + "\\.))";
-    var exponentFloat = "(?:(?:" + pointFloat + "|" +  intPart + ")" + exponent + ")";
-    var floatNumber = "(?:" + exponentFloat + "|" + pointFloat + ")";
-
-    this.$rules = {
-        "start" : [ {
-            token : "comment",
-            regex : "#.*$"
-        }, {
-            token : "string",           // """ string
-            regex : strPre + '"{3}(?:[^\\\\]|\\\\.)*?"{3}'
-        }, {
-            token : "string",           // multi line """ string start
-            merge : true,
-            regex : strPre + '"{3}.*$',
-            next : "qqstring"
-        }, {
-            token : "string",           // " string
-            regex : strPre + '"(?:[^\\\\]|\\\\.)*?"'
-        }, {
-            token : "string",           // ''' string
-            regex : strPre + "'{3}(?:[^\\\\]|\\\\.)*?'{3}"
-        }, {
-            token : "string",           // multi line ''' string start
-            merge : true,
-            regex : strPre + "'{3}.*$",
-            next : "qstring"
-        }, {
-            token : "string",           // ' string
-            regex : strPre + "'(?:[^\\\\]|\\\\.)*?'"
-        }, {
-            token : "constant.numeric", // imaginary
-            regex : "(?:" + floatNumber + "|\\d+)[jJ]\\b"
-        }, {
-            token : "constant.numeric", // float
-            regex : floatNumber
-        }, {
-            token : "constant.numeric", // long integer
-            regex : integer + "[lL]\\b"
-        }, {
-            token : "constant.numeric", // integer
-            regex : integer + "\\b"
-        }, {
-            token : function(value) {
-                if (keywords.hasOwnProperty(value))
-                    return "keyword";
-                else if (builtinConstants.hasOwnProperty(value))
-                    return "constant.language";
-                else if (futureReserved.hasOwnProperty(value))
-                    return "invalid.illegal";
-                else if (builtinFunctions.hasOwnProperty(value))
-                    return "support.function";
-                else if (value == "debugger")
-                    return "invalid.deprecated";
-                else
-                    return "identifier";
-            },
-            regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
-        }, {
-            token : "keyword.operator",
-            regex : "\\+|\\-|\\*|\\*\\*|\\/|\\/\\/|%|<<|>>|&|\\||\\^|~|<|>|<=|=>|==|!=|<>|="
-        }, {
-            token : "lparen.paren",
-            regex : "[\\[\\(\\{]"
-        }, {
-            token : "paren.rparen",
-            regex : "[\\]\\)\\}]"
-        }, {
-            token : "text",
-            regex : "\\s+"
-        } ],
-        "qqstring" : [ {
-            token : "string", // multi line """ string end
-            regex : '(?:[^\\\\]|\\\\.)*?"{3}',
-            next : "start"
-        }, {
-            token : "string",
-            merge : true,
-            regex : '.+'
-        } ],
-        "qstring" : [ {
-            token : "string",  // multi line ''' string end
-            regex : "(?:[^\\\\]|\\\\.)*?'{3}",
-            next : "start"
-        }, {
-            token : "string",
-            merge : true,
-            regex : '.+'
-        } ]
-    };
-};
-
-oop.inherits(PythonHighlightRules, TextHighlightRules);
-
-exports.PythonHighlightRules = PythonHighlightRules;
-});
-/* ***** BEGIN LICENSE BLOCK *****
- * Version: MPL 1.1/GPL 2.0/LGPL 2.1
- *
- * The contents of this file are subject to the Mozilla Public License Version
- * 1.1 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
- *
- * The Original Code is Ajax.org Code Editor (ACE).
- *
- * The Initial Developer of the Original Code is
- * Ajax.org B.V.
- * Portions created by the Initial Developer are Copyright (C) 2010
- * the Initial Developer. All Rights Reserved.
- *
- * Contributor(s):
- *      Fabian Jakobs <fabian AT ajax DOT org>
- *
- * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
- * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
- * use your version of this file under the terms of the MPL, indicate your
- * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
- * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the MPL, the GPL or the LGPL.
- *
- * ***** END LICENSE BLOCK ***** */
-
-define('ace/mode/folding/python', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/folding/fold_mode'], function(require, exports, module) {
-
-var oop = require("../../lib/oop");
-var BaseFoldMode = require("./fold_mode").FoldMode;
-
-var FoldMode = exports.FoldMode = function() {};
-oop.inherits(FoldMode, BaseFoldMode);
-
-(function() {
-
-    this.foldingStartMarker = /\:(:?\s*)?(:?#.*)?$/;
-    this.getFoldWidgetRange = BaseFoldMode.prototype.indentationBlock;
-
-}).call(FoldMode.prototype);
-
-});define('ace/mode/scala', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/javascript', 'ace/tokenizer', 'ace/mode/scala_highlight_rules'], function(require, exports, module) {
+define('ace/mode/scala', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/javascript', 'ace/tokenizer', 'ace/mode/scala_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var JavaScriptMode = require("./javascript").Mode;
@@ -17691,6 +18638,7 @@ oop.inherits(Mode, JavaScriptMode);
 exports.Mode = Mode;
 });
 define('ace/mode/scala_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -17871,6 +18819,7 @@ exports.ScalaHighlightRules = ScalaHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/scss', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/scss_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -17956,6 +18905,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/scss_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -18260,6 +19210,7 @@ exports.ScssHighlightRules = ScssHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/ruby', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/ruby_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -18278,7 +19229,6 @@ oop.inherits(Mode, TextMode);
 
     this.toggleCommentLines = function(state, doc, startRow, endRow) {
         var outdent = true;
-        var outentedRows = [];
         var re = /^(\s*)#/;
 
         for (var i=startRow; i<= endRow; i++) {
@@ -18310,7 +19260,6 @@ oop.inherits(Mode, TextMode);
 
         var tokenizedLine = this.$tokenizer.getLineTokens(line, state);
         var tokens = tokenizedLine.tokens;
-        var endState = tokenizedLine.state;
 
         if (tokens.length && tokens[tokens.length-1].type == "comment") {
             return indent;
@@ -18377,6 +19326,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/ruby_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -18552,6 +19502,7 @@ exports.RubyHighlightRules = RubyHighlightRules;
 * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/sql', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/sql_highlight_rules', 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
@@ -18618,11 +19569,10 @@ exports.Mode = Mode;
  * the provisions above, a recipient may use your version of this file under
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
- * ***** END LICENSE BLOCK *****
- *
- */
+ * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/sql_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var lang = require("../lib/lang");
@@ -18728,6 +19678,7 @@ exports.SqlHighlightRules = SqlHighlightRules;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/SVG', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/xml', 'ace/mode/javascript', 'ace/tokenizer', 'ace/mode/svg_highlight_rules', 'ace/mode/folding/mixed', 'ace/mode/folding/xml', 'ace/mode/folding/cstyle'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var XmlMode = require("./xml").Mode;
@@ -18805,6 +19756,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/svg_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/javascript_highlight_rules', 'ace/mode/xml_highlight_rules', 'ace/mode/xml_util'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var JavaScriptHighlightRules = require("./javascript_highlight_rules").JavaScriptHighlightRules;
@@ -18874,26 +19826,23 @@ exports.SvgHighlightRules = SvgHighlightRules;
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/mode/textile', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/textile_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/range'], function(require, exports, module) {
+define('ace/mode/textile', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/textile_highlight_rules', 'ace/mode/matching_brace_outdent'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextMode = require("./text").Mode;
 var Tokenizer = require("../tokenizer").Tokenizer;
 var TextileHighlightRules = require("./textile_highlight_rules").TextileHighlightRules;
 var MatchingBraceOutdent = require("./matching_brace_outdent").MatchingBraceOutdent;
-var Range = require("../range").Range;
 
-var Mode = function()
-{
+var Mode = function() {
     this.$tokenizer = new Tokenizer(new TextileHighlightRules().getRules());
     this.$outdent = new MatchingBraceOutdent();
 };
 oop.inherits(Mode, TextMode);
 
-(function()
-{
-    this.getNextLineIndent = function(state, line, tab)
-    {
+(function() {
+    this.getNextLineIndent = function(state, line, tab) {
         if (state == "intag")
             return tab;
         
@@ -18951,6 +19900,7 @@ exports.Mode = Mode;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/textile_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
@@ -18959,7 +19909,6 @@ var TextileHighlightRules = function() {
     this.$rules = {
         "start" : [
             {
-                token : "keyword", // start of block
                 token : function(value) {
                     if (value.match(/^h\d$/))
                         return "markup.heading." + value.charAt(1);
@@ -19857,6 +20806,115 @@ define("text!kitchen-sink/docs/latex.tex", [], "\\usepackage{amsmath}\n" +
   "  \\end{align}\n" +
   "\\end{document}");
 
+define("text!kitchen-sink/docs/sql.sql", [], "SELECT city, COUNT(id) AS users_count\n" +
+  "FROM users\n" +
+  "WHERE group_name = 'salesman'\n" +
+  "AND created > '2011-05-21'\n" +
+  "GROUP BY 1\n" +
+  "ORDER BY 2 DESC");
+
+define("text!kitchen-sink/docs/pgsql.pgsql", [], "\n" +
+  "BEGIN;\n" +
+  "\n" +
+  "/**\n" +
+  "* Samples from PostgreSQL src/tutorial/basics.source\n" +
+  "*/\n" +
+  "CREATE TABLE weather (\n" +
+  "	city		varchar(80),\n" +
+  "	temp_lo		int,		-- low temperature\n" +
+  "	temp_hi		int,		-- high temperature\n" +
+  "	prcp		real,		-- precipitation\n" +
+  "	\"date\"		date\n" +
+  ");\n" +
+  "\n" +
+  "CREATE TABLE cities (\n" +
+  "	name		varchar(80),\n" +
+  "	location	point\n" +
+  ");\n" +
+  "\n" +
+  "\n" +
+  "INSERT INTO weather\n" +
+  "    VALUES ('San Francisco', 46, 50, 0.25, '1994-11-27');\n" +
+  "\n" +
+  "INSERT INTO cities\n" +
+  "    VALUES ('San Francisco', '(-194.0, 53.0)');\n" +
+  "\n" +
+  "INSERT INTO weather (city, temp_lo, temp_hi, prcp, \"date\")\n" +
+  "    VALUES ('San Francisco', 43, 57, 0.0, '1994-11-29');\n" +
+  "\n" +
+  "INSERT INTO weather (date, city, temp_hi, temp_lo)\n" +
+  "    VALUES ('1994-11-29', 'Hayward', 54, 37);\n" +
+  "\n" +
+  "\n" +
+  "SELECT city, (temp_hi+temp_lo)/2 AS temp_avg, \"date\" FROM weather;\n" +
+  "\n" +
+  "SELECT city, temp_lo, temp_hi, prcp, \"date\", location\n" +
+  "    FROM weather, cities\n" +
+  "    WHERE city = name;\n" +
+  "\n" +
+  "\n" +
+  "\n" +
+  "/**\n" +
+  "* Dollar quotes starting at the end of the line are colored as SQL unless\n" +
+  "* a special language tag is used. Pearl and Python are currently implemented\n" +
+  "* but lots of others are possible.\n" +
+  "*/\n" +
+  "create or replace function blob_content_chunked(\n" +
+  "    in p_data bytea, \n" +
+  "    in p_chunk integer)\n" +
+  "returns setof bytea as $$\n" +
+  "-- Still SQL comments\n" +
+  "declare\n" +
+  "	v_size integer = octet_length(p_data);\n" +
+  "begin\n" +
+  "	for i in 1..v_size by p_chunk loop\n" +
+  "		return next substring(p_data from i for p_chunk);\n" +
+  "	end loop;\n" +
+  "end;\n" +
+  "$$ language plpgsql stable;\n" +
+  "\n" +
+  "\n" +
+  "-- pl/perl\n" +
+  "CREATE FUNCTION perl_max (integer, integer) RETURNS integer AS $perl$\n" +
+  "    # perl comment...\n" +
+  "    my ($x,$y) = @_;\n" +
+  "    if (! defined $x) {\n" +
+  "        if (! defined $y) { return undef; }\n" +
+  "        return $y;\n" +
+  "    }\n" +
+  "    if (! defined $y) { return $x; }\n" +
+  "    if ($x > $y) { return $x; }\n" +
+  "    return $y;\n" +
+  "$perl$ LANGUAGE plperl;\n" +
+  "\n" +
+  "-- pl/python\n" +
+  "CREATE FUNCTION usesavedplan() RETURNS trigger AS $python$\n" +
+  "    # python comment...\n" +
+  "    if SD.has_key(\"plan\"):\n" +
+  "        plan = SD[\"plan\"]\n" +
+  "    else:\n" +
+  "        plan = plpy.prepare(\"SELECT 1\")\n" +
+  "        SD[\"plan\"] = plan\n" +
+  "$python$ LANGUAGE plpythonu;\n" +
+  "\n" +
+  "\n" +
+  "-- psql commands\n" +
+  "\\df cash*\n" +
+  "\n" +
+  "\n" +
+  "-- Some string samples.\n" +
+  "select 'don''t do it now;' || 'maybe later';\n" +
+  "select E'dont\\'t do it';\n" +
+  "select length('some other''s stuff' || $$cat in hat's stuff $$);\n" +
+  "\n" +
+  "select $$ strings\n" +
+  "over multiple \n" +
+  "lines - use dollar quotes\n" +
+  "$$;\n" +
+  "\n" +
+  "END;\n" +
+  "");
+
 /* vim:ts=4:sts=4:sw=4:
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -19895,10 +20953,10 @@ define("text!kitchen-sink/docs/latex.tex", [], "\\usepackage{amsmath}\n" +
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/split', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/dom', 'ace/lib/lang', 'ace/lib/event_emitter', 'ace/editor', 'ace/virtual_renderer', 'ace/edit_session'], function(require, exports, module) {
+define('ace/split', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/lang', 'ace/lib/event_emitter', 'ace/editor', 'ace/virtual_renderer', 'ace/edit_session'], function(require, exports, module) {
+"use strict";
 
 var oop = require("./lib/oop");
-var dom = require("./lib/dom");
 var lang = require("./lib/lang");
 var EventEmitter = require("./lib/event_emitter").EventEmitter;
 
@@ -19935,7 +20993,6 @@ var Split = function(container, theme, splits) {
         el.className = this.$editorCSS;
         el.style.cssText = "position: absolute; top:0px; bottom:0px";
         this.$container.appendChild(el);
-        var session = new EditSession("");
         var editor = new Editor(new Renderer(el, this.$theme));
 
         editor.on("focus", function() {
@@ -20048,7 +21105,7 @@ var Split = function(container, theme, splits) {
     };
 
     this.setSession = function(session, idx) {
-        var editor
+        var editor;
         if (idx == null) {
             editor = this.$cEditor;
         } else {
@@ -20194,7 +21251,8 @@ exports.Split = Split;
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/editor', ['require', 'exports', 'module' , 'ace/lib/fixoldbrowsers', 'ace/lib/oop', 'ace/lib/lang', 'ace/lib/useragent', 'ace/keyboard/textinput', 'ace/mouse/mouse_handler', 'ace/keyboard/keybinding', 'ace/edit_session', 'ace/search', 'ace/range', 'ace/lib/event_emitter', 'ace/commands/command_manager', 'ace/commands/default_commands'], function(require, exports, module) {
+define('ace/editor', ['require', 'exports', 'module' , 'ace/lib/fixoldbrowsers', 'ace/lib/oop', 'ace/lib/lang', 'ace/lib/useragent', 'ace/keyboard/textinput', 'ace/mouse/mouse_handler', 'ace/mouse/fold_handler', 'ace/keyboard/keybinding', 'ace/edit_session', 'ace/search', 'ace/range', 'ace/lib/event_emitter', 'ace/commands/command_manager', 'ace/commands/default_commands'], function(require, exports, module) {
+"use strict";
 
 require("./lib/fixoldbrowsers");
 
@@ -20203,6 +21261,7 @@ var lang = require("./lib/lang");
 var useragent = require("./lib/useragent");
 var TextInput = require("./keyboard/textinput").TextInput;
 var MouseHandler = require("./mouse/mouse_handler").MouseHandler;
+var FoldHandler = require("./mouse/fold_handler").FoldHandler;
 //var TouchHandler = require("./touch_handler").TouchHandler;
 var KeyBinding = require("./keyboard/keybinding").KeyBinding;
 var EditSession = require("./edit_session").EditSession;
@@ -20216,7 +21275,7 @@ var Editor = function(renderer, session) {
     var container = renderer.getContainerElement();
     this.container = container;
     this.renderer = renderer;
-
+    
     this.textInput  = new TextInput(renderer.getTextAreaContainer(), this);
     this.keyBinding = new KeyBinding(this);
 
@@ -20225,6 +21284,7 @@ var Editor = function(renderer, session) {
         //this.$mouseHandler = new TouchHandler(this);
     } else {
         this.$mouseHandler = new MouseHandler(this);
+        new FoldHandler(this);
     }
 
     this.$blockScrolling = 0;
@@ -20239,30 +21299,6 @@ var Editor = function(renderer, session) {
 (function(){
 
     oop.implement(this, EventEmitter);
-
-    this.$forwardEvents = {
-        gutterclick: 1,
-        gutterdblclick: 1
-    };
-
-    this.$originalAddEventListener = this.addEventListener;
-    this.$originalRemoveEventListener = this.removeEventListener;
-
-    this.addEventListener = function(eventName, callback) {
-        if (this.$forwardEvents[eventName]) {
-            return this.renderer.addEventListener(eventName, callback);
-        } else {
-            return this.$originalAddEventListener(eventName, callback);
-        }
-    };
-
-    this.removeEventListener = function(eventName, callback) {
-        if (this.$forwardEvents[eventName]) {
-            return this.renderer.removeEventListener(eventName, callback);
-        } else {
-            return this.$originalRemoveEventListener(eventName, callback);
-        }
-    };
 
     this.setKeyboardHandler = function(keyboardHandler) {
         this.keyBinding.setKeyboardHandler(keyboardHandler);
@@ -20290,12 +21326,12 @@ var Editor = function(renderer, session) {
             this.session.removeEventListener("changeBreakpoint", this.$onChangeBreakpoint);
             this.session.removeEventListener("changeAnnotation", this.$onChangeAnnotation);
             this.session.removeEventListener("changeOverwrite", this.$onCursorChange);
+            this.session.removeEventListener("changeScrollTop", this.$onScrollTopChange);
+            this.session.removeEventListener("changeLeftTop", this.$onScrollLeftChange);
 
             var selection = this.session.getSelection();
             selection.removeEventListener("changeCursor", this.$onCursorChange);
             selection.removeEventListener("changeSelection", this.$onSelectionChange);
-
-            this.session.setScrollTopRow(this.renderer.getScrollTopRow());
         }
 
         this.session = session;
@@ -20337,6 +21373,12 @@ var Editor = function(renderer, session) {
         this.$onCursorChange = this.onCursorChange.bind(this);
         this.session.addEventListener("changeOverwrite", this.$onCursorChange);
 
+        this.$onScrollTopChange = this.onScrollTopChange.bind(this);
+        this.session.addEventListener("changeScrollTop", this.$onScrollTopChange);
+
+        this.$onScrollLeftChange = this.onScrollLeftChange.bind(this);
+        this.session.addEventListener("changeScrollLeft", this.$onScrollLeftChange);
+
         this.selection = session.getSelection();
         this.selection.addEventListener("changeCursor", this.$onCursorChange);
 
@@ -20346,16 +21388,17 @@ var Editor = function(renderer, session) {
         this.onChangeMode();
 
         this.onCursorChange();
+        this.onScrollTopChange();
+        this.onScrollLeftChange();
         this.onSelectionChange();
         this.onChangeFrontMarker();
         this.onChangeBackMarker();
         this.onChangeBreakpoint();
         this.onChangeAnnotation();
         this.session.getUseWrapMode() && this.renderer.adjustWrapLimit();
-        this.renderer.scrollToRow(session.getScrollTopRow());
         this.renderer.updateFull();
 
-        this._dispatchEvent("changeSession", {
+        this._emit("changeSession", {
             session: session,
             oldSession: oldSession
         });
@@ -20391,6 +21434,7 @@ var Editor = function(renderer, session) {
 
     this.setFontSize = function(size) {
         this.container.style.fontSize = size;
+        this.renderer.updateFontSize();
     };
 
     this.$highlightBrackets = function() {
@@ -20439,13 +21483,13 @@ var Editor = function(renderer, session) {
     this.onFocus = function() {
         this.renderer.showCursor();
         this.renderer.visualizeFocus();
-        this._dispatchEvent("focus");
+        this._emit("focus");
     };
 
     this.onBlur = function() {
         this.renderer.hideCursor();
         this.renderer.visualizeBlur();
-        this._dispatchEvent("blur");
+        this._emit("blur");
     };
 
     this.onDocumentChange = function(e) {
@@ -20459,7 +21503,7 @@ var Editor = function(renderer, session) {
             lastRow = Infinity;
         this.renderer.updateLines(range.start.row, lastRow);
 
-        this._dispatchEvent("change", e);
+        this._emit("change", e);
 
         // update cursor because tab characters can influence the cursor position
         this.onCursorChange();
@@ -20468,6 +21512,14 @@ var Editor = function(renderer, session) {
     this.onTokenizerUpdate = function(e) {
         var rows = e.data;
         this.renderer.updateLines(rows.first, rows.last);
+    };
+
+    this.onScrollTopChange = function() {
+        this.renderer.scrollToY(this.session.getScrollTop());
+    };
+
+    this.onScrollLeftChange = function() {
+        this.renderer.scrollToX(this.session.getScrollLeft());
     };
 
     this.onCursorChange = function() {
@@ -20707,13 +21759,21 @@ var Editor = function(renderer, session) {
         return this.$mouseHandler.getScrollSpeed();
     };
 
+    this.setDragDelay = function(dragDelay) {
+        this.$mouseHandler.setDragDelay(dragDelay);
+    };
+
+    this.getDragDelay = function() {
+        return this.$mouseHandler.getDragDelay();
+    };
+
     this.$selectionStyle = "line";
     this.setSelectionStyle = function(style) {
         if (this.$selectionStyle == style) return;
 
         this.$selectionStyle = style;
         this.onSelectionChange();
-        this._dispatchEvent("changeSelectionStyle", {data: style});
+        this._emit("changeSelectionStyle", {data: style});
     };
 
     this.getSelectionStyle = function() {
@@ -20802,6 +21862,7 @@ var Editor = function(renderer, session) {
         this.$showFoldWidgets = show;
         this.renderer.updateFull();
     };
+    
     this.getShowFoldWidgets = function() {
         return this.renderer.$gutterLayer.getShowFoldWidgets();
     };
@@ -21171,7 +22232,24 @@ var Editor = function(renderer, session) {
         this.selection.moveCursorToPosition(pos);
     };
 
-
+    this.jumpToMatching = function() {
+        var cursor = this.getCursorPosition();
+        var pos = this.session.findMatchingBracket(cursor);
+        if (!pos) {
+            cursor.column += 1;
+            pos = this.session.findMatchingBracket(cursor);
+        }
+        if (!pos) {
+            cursor.column -= 2;
+            pos = this.session.findMatchingBracket(cursor);
+        }
+        
+        if (pos) {
+            this.clearSelection();
+            this.moveCursorTo(pos.row, pos.column);
+        }
+    };
+    
     this.gotoLine = function(lineNumber, column) {
         this.selection.clearSelection();
         this.session.unfold({row: lineNumber - 1, column: column || 0});
@@ -21341,8 +22419,7 @@ var Editor = function(renderer, session) {
         var range = this.$search.find(this.session);
         if (range) {
             this.session.unfold(range);
-            this.gotoLine(range.end.row+1, range.end.column);
-            this.selection.setSelectionRange(range);
+            this.selection.setSelectionRange(range); // this scrolls selection into view
         }
     };
 
@@ -21403,6 +22480,7 @@ exports.Editor = Editor;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/keyboard/textinput', ['require', 'exports', 'module' , 'ace/lib/event', 'ace/lib/useragent', 'ace/lib/dom'], function(require, exports, module) {
+"use strict";
 
 var event = require("../lib/event");
 var useragent = require("../lib/useragent");
@@ -21415,6 +22493,7 @@ var TextInput = function(parentNode, host) {
         text.setAttribute("x-palm-disable-auto-cap", true);
         
     text.style.left = "-10000px";
+    text.style.position = "fixed";
     parentNode.insertBefore(text, parentNode.firstChild);
 
     var PLACEHOLDER = String.fromCharCode(0);
@@ -21554,7 +22633,7 @@ var TextInput = function(parentNode, host) {
     if ("onbeforecopy" in text && typeof clipboardData !== "undefined") {
         event.addListener(text, "beforecopy", function(e) {
             var copyText = host.getCopyText();
-            if(copyText)
+            if (copyText)
                 clipboardData.setData("Text", copyText);
             else
                 e.preventDefault();
@@ -21678,16 +22757,20 @@ exports.TextInput = TextInput;
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/mouse/mouse_handler', ['require', 'exports', 'module' , 'ace/lib/event', 'ace/mouse/default_handlers', 'ace/mouse/mouse_event'], function(require, exports, module) {
+define('ace/mouse/mouse_handler', ['require', 'exports', 'module' , 'ace/lib/event', 'ace/mouse/default_handlers', 'ace/mouse/default_gutter_handler', 'ace/mouse/mouse_event'], function(require, exports, module) {
+"use strict";
 
 var event = require("../lib/event");
 var DefaultHandlers = require("./default_handlers").DefaultHandlers;
+var DefaultGutterHandler = require("./default_gutter_handler").GutterHandler;
 var MouseEvent = require("./mouse_event").MouseEvent;
 
 var MouseHandler = function(editor) {
     this.editor = editor;
     
-    this.defaultHandlers = new DefaultHandlers(editor);
+    new DefaultHandlers(editor);
+    new DefaultGutterHandler(editor);
+    
     event.addListener(editor.container, "mousedown", function(e) {
         editor.focus();
         return event.preventDefault(e);
@@ -21697,13 +22780,19 @@ var MouseHandler = function(editor) {
     });
 
     var mouseTarget = editor.renderer.getMouseEventTarget();
-    event.addListener(mouseTarget, "mousedown", this.onMouseDown.bind(this));
-    event.addListener(mouseTarget, "click", this.onMouseClick.bind(this));
-    event.addListener(mouseTarget, "mousemove", this.onMouseMove.bind(this));
-    event.addMultiMouseDownListener(mouseTarget, 0, 2, 500, this.onMouseDoubleClick.bind(this));
-    event.addMultiMouseDownListener(mouseTarget, 0, 3, 600, this.onMouseTripleClick.bind(this));
-    event.addMultiMouseDownListener(mouseTarget, 0, 4, 600, this.onMouseQuadClick.bind(this));
-    event.addMouseWheelListener(editor.container, this.onMouseWheel.bind(this));
+    event.addListener(mouseTarget, "mousedown", this.onMouseEvent.bind(this, "mousedown"));
+    event.addListener(mouseTarget, "click", this.onMouseEvent.bind(this, "click"));
+    event.addListener(mouseTarget, "mousemove", this.onMouseMove.bind(this, "mousemove"));
+    event.addMultiMouseDownListener(mouseTarget, 0, 2, 500, this.onMouseEvent.bind(this, "dblclick"));
+    event.addMultiMouseDownListener(mouseTarget, 0, 3, 600, this.onMouseEvent.bind(this, "tripleclick"));
+    event.addMultiMouseDownListener(mouseTarget, 0, 4, 600, this.onMouseEvent.bind(this, "quadclick"));
+    event.addMouseWheelListener(editor.container, this.onMouseWheel.bind(this, "mousewheel"));
+    
+    var gutterEl = editor.renderer.$gutter;
+    event.addListener(gutterEl, "mousedown", this.onMouseEvent.bind(this, "guttermousedown"));
+    event.addListener(gutterEl, "click", this.onMouseEvent.bind(this, "gutterclick"));
+    event.addListener(gutterEl, "dblclick", this.onMouseEvent.bind(this, "gutterdblclick"));
+    event.addListener(gutterEl, "mousemove", this.onMouseMove.bind(this, "gutter"));
 };
 
 (function() {
@@ -21717,42 +22806,35 @@ var MouseHandler = function(editor) {
         return this.$scrollSpeed;
     };
 
-    this.onMouseDown = function(e) {
-        this.editor._dispatchEvent("mousedown", new MouseEvent(e, this.editor));
-    };
-
-    this.onMouseClick = function(e) {
-        this.editor._dispatchEvent("click", new MouseEvent(e, this.editor));
+    this.onMouseEvent = function(name, e) {
+        this.editor._emit(name, new MouseEvent(e, this.editor));
     };
     
-    this.onMouseMove = function(e) {
+    this.$dragDelay = 250;
+    this.setDragDelay = function(dragDelay) {
+        this.$dragDelay = dragDelay;
+    };
+
+    this.getDragDelay = function() {
+        return this.$dragDelay;
+    };
+
+    this.onMouseMove = function(name, e) {
         // optimization, because mousemove doesn't have a default handler.
-        var listeners = this.editor._eventRegistry && this.editor._eventRegistry["mousemove"];
+        var listeners = this.editor._eventRegistry && this.editor._eventRegistry.mousemove;
         if (!listeners || !listeners.length)
             return;
 
-        this.editor._dispatchEvent("mousemove", new MouseEvent(e, this.editor));
+        this.editor._emit(name, new MouseEvent(e, this.editor));
     };
 
-    this.onMouseDoubleClick = function(e) {
-        this.editor._dispatchEvent("dblclick", new MouseEvent(e, this.editor));
-    };
-
-    this.onMouseTripleClick = function(e) {
-        this.editor._dispatchEvent("tripleclick", new MouseEvent(e, this.editor));
-    };
-
-    this.onMouseQuadClick = function(e) {
-        this.editor._dispatchEvent("quadclick", new MouseEvent(e, this.editor));
-    };
-
-    this.onMouseWheel = function(e) {
+    this.onMouseWheel = function(name, e) {
         var mouseEvent = new MouseEvent(e, this.editor);
         mouseEvent.speed = this.$scrollSpeed * 2;
         mouseEvent.wheelX = e.wheelX;
         mouseEvent.wheelY = e.wheelY;
         
-        this.editor._dispatchEvent("mousewheel", mouseEvent);
+        this.editor._emit(name, mouseEvent);
     };
 
 }).call(MouseHandler.prototype);
@@ -21798,18 +22880,17 @@ exports.MouseHandler = MouseHandler;
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/mouse/default_handlers', ['require', 'exports', 'module' , 'ace/lib/event', 'ace/lib/dom', 'ace/lib/event_emitter', 'ace/lib/browser_focus'], function(require, exports, module) {
+define('ace/mouse/default_handlers', ['require', 'exports', 'module' , 'ace/lib/event', 'ace/lib/dom', 'ace/lib/browser_focus'], function(require, exports, module) {
+"use strict";
 
 var event = require("../lib/event");
 var dom = require("../lib/dom");
-var EventEmitter = require("../lib/event_emitter").EventEmitter;
 var BrowserFocus = require("../lib/browser_focus").BrowserFocus;
 
 var STATE_UNKNOWN = 0;
 var STATE_SELECT = 1;
 var STATE_DRAG = 2;
 
-var DRAG_TIMER = 250; // milliseconds
 var DRAG_OFFSET = 5; // pixels
 
 function DefaultHandlers(editor) {
@@ -21856,19 +22937,11 @@ function DefaultHandlers(editor) {
             if (selectionEmpty) {
                 editor.moveCursorToPosition(pos);
             }
-            if(button == 2) {
+            if (button == 2) {
                 editor.textInput.onContextMenu({x: ev.clientX, y: ev.clientY}, selectionEmpty);
                 event.capture(editor.container, function(){}, editor.textInput.onContextMenuClose);
             }
             return;
-        }
-        else {
-            // Select the fold as the user clicks it.
-            var fold = editor.session.getFoldAt(pos.row, pos.column, 1);
-            if (fold) {
-                editor.selection.setSelectionRange(fold.range);
-                return;
-            }
         }
 
         if (!inSelection) {
@@ -21878,9 +22951,8 @@ function DefaultHandlers(editor) {
         }
 
         var mousePageX = pageX, mousePageY = pageY;
-        var overwrite = editor.getOverwrite();
         var mousedownTime = (new Date()).getTime();
-        var dragCursor, dragRange;
+        var dragCursor, dragRange, dragSelectionMarker;
 
         var onMouseSelection = function(e) {
             mousePageX = event.getDocumentX(e);
@@ -21943,7 +23015,7 @@ function DefaultHandlers(editor) {
                     cursor.row = Math.max(0, Math.min(cursor.row, editor.session.getLength()-1));
                     onStartSelect(cursor);
                 }
-                else if ((time - mousedownTime) > DRAG_TIMER) {
+                else if ((time - mousedownTime) > editor.getDragDelay()) {
                     state = STATE_DRAG;
                     dragRange = editor.getSelectionRange();
                     var style = editor.getSelectionStyle();
@@ -22017,19 +23089,9 @@ function DefaultHandlers(editor) {
         var pos = ev.getDocumentPosition();
         var editor = this.editor;
         
-        // If the user dclicked on a fold, then expand it.
-        var fold = editor.session.getFoldAt(pos.row, pos.column, 1);
-        if (fold) {
-            if (ev.getAccelKey())
-                editor.session.removeFold(fold);
-            else
-                editor.session.expandFold(fold);
-        }
-        else {
-            editor.moveCursorToPosition(pos);
-            editor.selection.selectWord();
-            this.$clickSelection = editor.getSelectionRange();
-        }
+        editor.moveCursorToPosition(pos);
+        editor.selection.selectWord();
+        this.$clickSelection = editor.getSelectionRange();
     };
     
     this.onTripleClick = function(ev) {
@@ -22106,6 +23168,7 @@ function calcDistance(ax, ay, bx, by) {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/lib/browser_focus', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/event', 'ace/lib/event_emitter'], function(require, exports, module) {
+"use strict";
 
 var oop = require("./oop");
 var event = require("./event");
@@ -22207,10 +23270,63 @@ exports.BrowserFocus = BrowserFocus;
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/mouse/mouse_event', ['require', 'exports', 'module' , 'ace/lib/event', 'ace/lib/dom'], function(require, exports, module) {
+define('ace/mouse/default_gutter_handler', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
+
+function GutterHandler(editor) {
+    editor.setDefaultHandler("gutterclick", function(e) {
+        var row = e.getDocumentPosition().row;
+        var selection = editor.session.selection;
+        
+        selection.moveCursorTo(row, 0);
+        selection.selectLine();
+    });
+}
+
+exports.GutterHandler = GutterHandler;
+
+});/* vim:ts=4:sts=4:sw=4:
+ * ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is Ajax.org Code Editor (ACE).
+ *
+ * The Initial Developer of the Original Code is
+ * Ajax.org B.V.
+ * Portions created by the Initial Developer are Copyright (C) 2010
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *      Fabian Jakobs <fabian AT ajax DOT org>
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
+define('ace/mouse/mouse_event', ['require', 'exports', 'module' , 'ace/lib/event'], function(require, exports, module) {
+"use strict";
 
 var event = require("../lib/event");
-var dom = require("../lib/dom");
 
 /**
  * Custom Ace mouse event
@@ -22242,6 +23358,11 @@ var MouseEvent = exports.MouseEvent = function(domEvent, editor) {
     this.preventDefault = function() {
         event.preventDefault(this.domEvent);
         this.defaultPrevented = true;
+    };
+    
+    this.stop = function() {
+        this.stopPropagation();
+        this.preventDefault();
     };
 
     /**
@@ -22309,7 +23430,77 @@ var MouseEvent = exports.MouseEvent = function(domEvent, editor) {
 }).call(MouseEvent.prototype);
 
 });
-/* ***** BEGIN LICENSE BLOCK *****
+/* vim:ts=4:sts=4:sw=4:
+ * ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is Ajax.org Code Editor (ACE).
+ *
+ * The Initial Developer of the Original Code is
+ * Ajax.org B.V.
+ * Portions created by the Initial Developer are Copyright (C) 2010
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *      Fabian Jakobs <fabian AT ajax DOT org>
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
+define('ace/mouse/fold_handler', ['require', 'exports', 'module' ], function(require, exports, module) {
+"use strict";
+
+function FoldHandler(editor) {
+    
+    editor.on("click", function(e) {
+        var position = e.getDocumentPosition();
+        var session = editor.session;
+        
+        // If the user dclicked on a fold, then expand it.
+        var fold = session.getFoldAt(position.row, position.column, 1);
+        if (fold) {
+            if (e.getAccelKey())
+                session.removeFold(fold);
+            else
+                session.expandFold(fold);
+                
+            e.stop();
+        }
+    });
+    
+    editor.on("gutterclick", function(e) {
+        if (e.domEvent.target.className.indexOf("ace_fold-widget") != -1) {
+            var row = e.getDocumentPosition().row;
+            editor.session.onFoldWidgetClick(row, e.domEvent);
+            e.stop();
+        }
+    });
+}
+
+exports.FoldHandler = FoldHandler;
+
+});/* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -22349,6 +23540,7 @@ var MouseEvent = exports.MouseEvent = function(domEvent, editor) {
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/keyboard/keybinding', ['require', 'exports', 'module' , 'ace/lib/keys', 'ace/lib/event', 'ace/commands/default_commands'], function(require, exports, module) {
+"use strict";
 
 var keyUtil  = require("../lib/keys");
 var event = require("../lib/event");
@@ -22477,6 +23669,7 @@ exports.KeyBinding = KeyBinding;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/commands/default_commands', ['require', 'exports', 'module' , 'ace/lib/lang'], function(require, exports, module) {
+"use strict";
 
 var lang = require("../lib/lang");
 
@@ -22501,7 +23694,7 @@ exports.commands = [{
     name: "gotoline",
     bindKey: bindKey("Ctrl-L", "Command-L"),
     exec: function(editor) {
-        var line = parseInt(prompt("Enter line number:"));
+        var line = parseInt(prompt("Enter line number:"), 10);
         if (!isNaN(line)) {
             editor.gotoLine(line);
         }
@@ -22700,6 +23893,11 @@ exports.commands = [{
     bindKey: bindKey("Ctrl-Shift-E", "Command-Shift-E"),
     exec: function(editor) { editor.commands.replay(editor); },
     readOnly: true
+}, {
+    name: "jumptomatching",
+    bindKey: bindKey("Ctrl-Shift-P", "Ctrl-Shift-P"),
+    exec: function(editor) { editor.jumpToMatching(); },
+    readOnly: true
 }, 
 
 // commands disabled in readOnly mode
@@ -22861,6 +24059,7 @@ exports.commands = [{
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/search', ['require', 'exports', 'module' , 'ace/lib/lang', 'ace/lib/oop', 'ace/range'], function(require, exports, module) {
+"use strict";
 
 var lang = require("./lib/lang");
 var oop = require("./lib/oop");
@@ -23164,6 +24363,7 @@ Search.SELECTION = 2;
 exports.Search = Search;
 });
 define('ace/commands/command_manager', ['require', 'exports', 'module' , 'ace/lib/keys'], function(require, exports, module) {
+"use strict";
 
 var keyUtil = require("../lib/keys");
 
@@ -23403,6 +24603,7 @@ exports.CommandManager = CommandManager;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/virtual_renderer', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/dom', 'ace/lib/event', 'ace/lib/useragent', 'ace/layer/gutter', 'ace/layer/marker', 'ace/layer/text', 'ace/layer/cursor', 'ace/scrollbar', 'ace/renderloop', 'ace/lib/event_emitter', 'text!ace/css/editor.css'], function(require, exports, module) {
+"use strict";
 
 var oop = require("./lib/oop");
 var dom = require("./lib/dom");
@@ -23420,16 +24621,15 @@ var editorCss = require("text!./css/editor.css");
 dom.importCssString(editorCss, "ace_editor");
 
 var VirtualRenderer = function(container, theme) {
+    var _self = this;
+    
     this.container = container;
 
     // TODO: this breaks rendering in Cloud9 with multiple ace instances
 //    // Imports CSS once per DOM document ('ace_editor' serves as an identifier).
 //    dom.importCssString(editorCss, "ace_editor", container.ownerDocument);
     
-    // Chrome has some strange rendering issues if this is not done async
-    setTimeout(function() {
-        dom.addCssClass(container, "ace_editor");
-    }, 0)
+    dom.addCssClass(container, "ace_editor");
 
     this.setTheme(theme);
 
@@ -23446,6 +24646,8 @@ var VirtualRenderer = function(container, theme) {
     this.scroller.appendChild(this.content);
 
     this.$gutterLayer = new GutterLayer(this.$gutter);
+    this.$gutterLayer.on("changeGutterWidth", this.onResize.bind(this, true));    
+    
     this.$markerBack = new MarkerLayer(this.content);
 
     var textLayer = this.$textLayer = new TextLayer(this.content);
@@ -23464,17 +24666,23 @@ var VirtualRenderer = function(container, theme) {
     this.$horizScrollAlwaysVisible = true;
 
     this.scrollBar = new ScrollBar(container);
-    this.scrollBar.addEventListener("scroll", this.onScroll.bind(this));
+    this.scrollBar.addEventListener("scroll", function(e) {
+        _self.session.setScrollTop(e.data);
+    });
 
     this.scrollTop = 0;
+    this.scrollLeft = 0;
+    
+    event.addListener(this.scroller, "scroll", function() {
+        _self.session.setScrollLeft(_self.scroller.scrollLeft);
+    });
 
     this.cursorPos = {
         row : 0,
         column : 0
     };
 
-    var _self = this;
-    this.$textLayer.addEventListener("changeCharaterSize", function() {
+    this.$textLayer.addEventListener("changeCharacterSize", function() {
         _self.characterWidth = textLayer.getCharacterWidth();
         _self.lineHeight = textLayer.getLineHeight();
         _self.$updatePrintMargin();
@@ -23482,8 +24690,6 @@ var VirtualRenderer = function(container, theme) {
 
         _self.$loop.schedule(_self.CHANGE_FULL);
     });
-    event.addListener(this.$gutter, "click", this.$onGutterClick.bind(this));
-    event.addListener(this.$gutter, "dblclick", this.$onGutterClick.bind(this));
 
     this.$size = {
         width: 0,
@@ -23529,6 +24735,7 @@ var VirtualRenderer = function(container, theme) {
     this.CHANGE_MARKER_BACK = 128;
     this.CHANGE_MARKER_FRONT = 256;
     this.CHANGE_FULL = 512;
+    this.CHANGE_H_SCROLL = 1024;
 
     oop.implement(this, EventEmitter);
 
@@ -23600,7 +24807,7 @@ var VirtualRenderer = function(container, theme) {
             this.scrollBar.setHeight(size.scrollerHeight);
 
             if (this.session) {
-                this.scrollToY(this.getScrollTop());
+                this.session.setScrollTop(this.getScrollTop());
                 changes = changes | this.CHANGE_FULL;
             }
         }
@@ -23611,7 +24818,7 @@ var VirtualRenderer = function(container, theme) {
 
             var gutterWidth = this.showGutter ? this.$gutter.offsetWidth : 0;
             this.scroller.style.left = gutterWidth + "px";
-            size.scrollerWidth = Math.max(0, width - gutterWidth - this.scrollBar.getWidth())
+            size.scrollerWidth = Math.max(0, width - gutterWidth - this.scrollBar.getWidth());
             this.scroller.style.width = size.scrollerWidth + "px";
 
             if (this.session.getUseWrapMode() && this.adjustWrapLimit() || force)
@@ -23625,19 +24832,6 @@ var VirtualRenderer = function(container, theme) {
         var availableWidth = this.$size.scrollerWidth - this.$padding * 2;
         var limit = Math.floor(availableWidth / this.characterWidth);
         return this.session.adjustWrapLimit(limit);
-    };
-
-    this.$onGutterClick = function(e) {
-        var pageY = event.getDocumentY(e);
-        var row = this.screenToTextCoordinates(0, pageY).row;
-
-        if (e.target.className.indexOf('ace_fold-widget') != -1)
-            return this.session.onFoldWidgetClick(row, e);
-
-        this._dispatchEvent("gutter" + e.type, {
-            row: row,
-            htmlEvent: e
-        });
     };
 
     this.setShowInvisibles = function(showInvisibles) {
@@ -23718,6 +24912,9 @@ var VirtualRenderer = function(container, theme) {
         // this persists in IE9
         if (useragent.isIE)
             return;
+        
+        if (this.layerConfig.lastRow === 0)
+            return;
 
         var pos = this.$cursorLayer.getPixelPosition();
         if (!pos)
@@ -23768,10 +24965,6 @@ var VirtualRenderer = function(container, theme) {
             if (!this.$horizScrollAlwaysVisible || !this.$horizScroll)
                 this.$loop.schedule(this.CHANGE_SCROLL);
         }
-    };
-
-    this.onScroll = function(e) {
-        this.scrollToY(e.data);
     };
 
     this.$updateScrollBar = function() {
@@ -23848,6 +25041,11 @@ var VirtualRenderer = function(container, theme) {
 
         if (changes & this.CHANGE_SIZE)
             this.$updateScrollBar();
+
+        if (changes & this.CHANGE_H_SCROLL) {
+            //this.content.style.left = -this.scrollLeft + "px";
+            this.scroller.scrollLeft = this.scrollLeft
+        }
     };
 
     this.$computeLayerConfig = function() {
@@ -23857,7 +25055,6 @@ var VirtualRenderer = function(container, theme) {
         var minHeight = this.$size.scrollerHeight + this.lineHeight;
 
         var longestLine = this.$getLongestLine();
-        var widthChanged = this.layerConfig.width != longestLine;
 
         var horizScroll = this.$horizScrollAlwaysVisible || this.$size.scrollerWidth - longestLine < 0;
         var horizScrollChanged = this.$horizScroll !== horizScroll;
@@ -23866,7 +25063,7 @@ var VirtualRenderer = function(container, theme) {
             this.scroller.style.overflowX = horizScroll ? "scroll" : "hidden";
 
         var maxHeight = this.session.getScreenLength() * this.lineHeight;
-        this.scrollTop = Math.max(0, Math.min(this.scrollTop, maxHeight - this.$size.scrollerHeight));
+        this.session.setScrollTop(Math.max(0, Math.min(this.scrollTop, maxHeight - this.$size.scrollerHeight)));
 
         var lineCount = Math.ceil(minHeight / this.lineHeight) - 1;
         var firstRow = Math.max(0, Math.round((this.scrollTop - offset) / this.lineHeight));
@@ -23914,12 +25111,6 @@ var VirtualRenderer = function(container, theme) {
         this.content.style.marginTop = (-offset) + "px";
         this.content.style.width = longestLine + 2 * this.$padding + "px";
         this.content.style.height = minHeight + "px";
-
-        // scroller.scrollWidth was smaller than scrollLeft we needed
-        if (this.$desiredScrollLeft) {
-            this.scrollToX(this.$desiredScrollLeft);
-            this.$desiredScrollLeft = 0;
-        }
 
         // Horizontal scrollbar visibility may have changed, which changes
         // the client height of the scroller
@@ -24014,33 +25205,32 @@ var VirtualRenderer = function(container, theme) {
         var top = pos.top;
 
         if (this.scrollTop > top) {
-            this.scrollToY(top);
+            this.session.setScrollTop(top);
         }
 
         if (this.scrollTop + this.$size.scrollerHeight < top + this.lineHeight) {
-            this.scrollToY(top + this.lineHeight - this.$size.scrollerHeight);
+            this.session.setScrollTop(top + this.lineHeight - this.$size.scrollerHeight);
         }
 
-        var scrollLeft = this.scroller.scrollLeft;
+        var scrollLeft = this.scrollLeft;
 
         if (scrollLeft > left) {
-            this.scrollToX(left);
+            if (left < this.$padding + 2 * this.layerConfig.characterWidth)
+                left = 0;
+            this.session.setScrollLeft(left);
         }
 
         if (scrollLeft + this.$size.scrollerWidth < left + this.characterWidth) {
-            if (left > this.layerConfig.width)
-                this.$desiredScrollLeft = left + 2 * this.characterWidth;
-            else
-                this.scrollToX(Math.round(left + this.characterWidth - this.$size.scrollerWidth));
+            this.session.setScrollLeft(Math.round(left + this.characterWidth - this.$size.scrollerWidth));
         }
     };
 
     this.getScrollTop = function() {
-        return this.scrollTop;
+        return this.session.getScrollTop();
     };
 
     this.getScrollLeft = function() {
-        return this.scroller.scrollLeft;
+        return this.session.getScrollTop();
     };
 
     this.getScrollTopRow = function() {
@@ -24052,26 +25242,21 @@ var VirtualRenderer = function(container, theme) {
     };
 
     this.scrollToRow = function(row) {
-        this.scrollToY(row * this.lineHeight);
+        this.session.setScrollTop(row * this.lineHeight);
     };
 
     this.scrollToLine = function(line, center) {
-        var lineHeight = { lineHeight: this.lineHeight };
-        var offset = 0;
-        for (var l = 1; l < line; l++) {
-            offset += this.session.getRowHeight(lineHeight, l-1);
-        }
-
-        if (center) {
+        var pos = this.$cursorLayer.getPixelPosition({row: line, column: 0});
+        var offset = pos.top;
+        if (center)
             offset -= this.$size.scrollerHeight / 2;
-        }
-        this.scrollToY(offset);
+
+        this.session.setScrollTop(offset);
     };
 
     this.scrollToY = function(scrollTop) {
         // after calling scrollBar.setScrollTop
         // scrollbar sends us event with same scrollTop. ignore it
-        scrollTop = Math.max(0, scrollTop);
         if (this.scrollTop !== scrollTop) {
             this.$loop.schedule(this.CHANGE_SCROLL);
             this.scrollTop = scrollTop;
@@ -24079,21 +25264,24 @@ var VirtualRenderer = function(container, theme) {
     };
 
     this.scrollToX = function(scrollLeft) {
-        if (scrollLeft <= this.$padding + 2 * this.layerConfig.characterWidth)
+        if (scrollLeft <= this.$padding)
             scrollLeft = 0;
 
-        this.scroller.scrollLeft = scrollLeft;
+        if (this.scrollLeft !== scrollLeft) {
+            this.$loop.schedule(this.CHANGE_H_SCROLL);
+            this.scrollLeft = scrollLeft;
+        }
     };
 
     this.scrollBy = function(deltaX, deltaY) {
-        deltaY && this.scrollToY(this.scrollTop + deltaY);
-        deltaX && this.scrollToX(this.scroller.scrollLeft + deltaX);
+        deltaY && this.session.setScrollTop(this.session.getScrollTop() + deltaY);
+        deltaX && this.session.setScrollLeft(this.session.getScrollLeft() + deltaX);
     };
 
     this.isScrollableBy = function(deltaX, deltaY) {
-        if (deltaY < 0 && this.scrollTop > 0)
+        if (deltaY < 0 && this.session.getScrollTop() > 0)
            return true;
-        if (deltaY > 0 && this.scrollTop + this.$size.scrollerHeight < this.layerConfig.maxHeight)
+        if (deltaY > 0 && this.session.getScrollTop() + this.$size.scrollerHeight < this.layerConfig.maxHeight)
            return true;
         // todo: handle horizontal scrolling
     };
@@ -24101,10 +25289,14 @@ var VirtualRenderer = function(container, theme) {
     this.screenToTextCoordinates = function(pageX, pageY) {
         var canvasPos = this.scroller.getBoundingClientRect();
 
-        var col = Math.round((pageX + this.scroller.scrollLeft - canvasPos.left - this.$padding - dom.getPageScrollLeft())
-                / this.characterWidth);
-        var row = Math.floor((pageY + this.scrollTop - canvasPos.top - dom.getPageScrollTop())
-                / this.lineHeight);
+        var col = Math.round(
+            (pageX + this.scrollLeft - canvasPos.left - this.$padding - dom.getPageScrollLeft())
+            / this.characterWidth
+        );
+        var row = Math.floor(
+            (pageY + this.scrollTop - canvasPos.top - dom.getPageScrollTop())
+            / this.lineHeight
+        );
 
         return this.session.screenToDocumentPosition(row, Math.max(col, 0));
     };
@@ -24117,8 +25309,8 @@ var VirtualRenderer = function(container, theme) {
         var y = pos.row * this.lineHeight;
 
         return {
-            pageX: canvasPos.left + x - this.getScrollLeft(),
-            pageY: canvasPos.top + y - this.getScrollTop()
+            pageX: canvasPos.left + x - this.scrollLeft,
+            pageY: canvasPos.top + y - this.scrollTop
         };
     };
 
@@ -24268,15 +25460,20 @@ exports.VirtualRenderer = VirtualRenderer;
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/layer/gutter', ['require', 'exports', 'module' , 'ace/lib/dom'], function(require, exports, module) {
+define('ace/layer/gutter', ['require', 'exports', 'module' , 'ace/lib/dom', 'ace/lib/oop', 'ace/lib/event_emitter'], function(require, exports, module) {
+"use strict";
 
 var dom = require("../lib/dom");
+var oop = require("../lib/oop");
+var EventEmitter = require("../lib/event_emitter").EventEmitter;
 
 var Gutter = function(parentEl) {
     this.element = dom.createElement("div");
     this.element.className = "ace_layer ace_gutter-layer";
     parentEl.appendChild(this.element);
     this.setShowFoldWidgets(this.$showFoldWidgets);
+    
+    this.gutterWidth = 0;
 
     this.$breakpoints = [];
     this.$annotations = [];
@@ -24285,6 +25482,8 @@ var Gutter = function(parentEl) {
 
 (function() {
 
+    oop.implement(this, EventEmitter);
+    
     this.setSession = function(session) {
         this.session = session;
     };
@@ -24293,7 +25492,7 @@ var Gutter = function(parentEl) {
         if (!this.$decorations[row])
             this.$decorations[row] = "";
         this.$decorations[row] += " ace_" + className;
-    }
+    };
 
     this.removeGutterDecoration = function(row, className){
         this.$decorations[row] = this.$decorations[row].replace(" ace_" + className, "");
@@ -24382,6 +25581,12 @@ var Gutter = function(parentEl) {
         }
         this.element = dom.setInnerHtml(this.element, html.join(""));
         this.element.style.height = config.minHeight + "px";
+        
+        var gutterWidth = this.element.offsetWidth;
+        if (gutterWidth !== this.gutterWidth) {
+            this.gutterWidth = gutterWidth;
+            this._emit("changeGutterWidth", gutterWidth);
+        }
     };
 
     this.$showFoldWidgets = true;
@@ -24393,6 +25598,7 @@ var Gutter = function(parentEl) {
 
         this.$showFoldWidgets = show;
     };
+    
     this.getShowFoldWidgets = function() {
         return this.$showFoldWidgets;
     };
@@ -24442,6 +25648,7 @@ exports.Gutter = Gutter;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/layer/marker', ['require', 'exports', 'module' , 'ace/range', 'ace/lib/dom'], function(require, exports, module) {
+"use strict";
 
 var Range = require("../range").Range;
 var dom = require("../lib/dom");
@@ -24544,10 +25751,11 @@ var Marker = function(parentEl) {
      * Draws a multi line marker, where lines span the full width
      */
      this.drawMultiLineMarker = function(stringBuilder, range, clazz, layerConfig, type) {
-        // from selection start to the end of the line
         var padding = type === "background" ? 0 : this.$padding;
+        var layerWidth = layerConfig.width + 2 * this.$padding - padding;
+        // from selection start to the end of the line
         var height = layerConfig.lineHeight;
-        var width = Math.round(layerConfig.width - (range.start.column * layerConfig.characterWidth));
+        var width = Math.round(layerWidth - (range.start.column * layerConfig.characterWidth));
         var top = this.$getTop(range.start.row, layerConfig);
         var left = Math.round(
             padding + range.start.column * layerConfig.characterWidth
@@ -24578,12 +25786,11 @@ var Marker = function(parentEl) {
         if (height < 0)
             return;
         top = this.$getTop(range.start.row + 1, layerConfig);
-        width = layerConfig.width;
 
         stringBuilder.push(
             "<div class='", clazz, "' style='",
             "height:", height, "px;",
-            "width:", width, "px;",
+            "width:", layerWidth, "px;",
             "top:", top, "px;",
             "left:", padding, "px;'></div>"
         );
@@ -24662,6 +25869,7 @@ exports.Marker = Marker;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/layer/text', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/dom', 'ace/lib/lang', 'ace/lib/useragent', 'ace/lib/event_emitter'], function(require, exports, module) {
+"use strict";
 
 var oop = require("../lib/oop");
 var dom = require("../lib/dom");
@@ -24705,7 +25913,7 @@ var Text = function(parentEl) {
         var size = this.$measureSizes();
         if (size && (this.$characterSize.width !== size.width || this.$characterSize.height !== size.height)) {
             this.$characterSize = size;
-            this._dispatchEvent("changeCharaterSize", {data: size});
+            this._emit("changeCharacterSize", {data: size});
         }
     };
 
@@ -25010,7 +26218,10 @@ var Text = function(parentEl) {
 
         if (!this.$textToken[token.type]) {
             var classes = "ace_" + token.type.replace(/\./g, " ace_");
-            stringBuilder.push("<span class='", classes, "'>", output, "</span>");
+            var style = "";
+            if (token.type == "fold")
+                style = " style='width:" + (token.value.length * this.config.characterWidth) + "px;' ";
+            stringBuilder.push("<span class='", classes, "'", style, ">", output, "</span>");
         }
         else {
             stringBuilder.push(output);
@@ -25022,7 +26233,6 @@ var Text = function(parentEl) {
         var chars = 0;
         var split = 0;
         var splitChars;
-        var characterWidth = this.config.characterWidth;
         var screenColumn = 0;
         var self = this;
 
@@ -25226,6 +26436,7 @@ exports.Text = Text;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/layer/cursor', ['require', 'exports', 'module' , 'ace/lib/dom'], function(require, exports, module) {
+"use strict";
 
 var dom = require("../lib/dom");
 
@@ -25280,7 +26491,7 @@ var Cursor = function(parentEl) {
         }, 1000);
     };
 
-    this.getPixelPosition = function(onScreen) {
+    this.getPixelPosition = function(position, onScreen) {
         if (!this.config || !this.session) {
             return {
                 left : 0,
@@ -25288,7 +26499,8 @@ var Cursor = function(parentEl) {
             };
         }
 
-        var position = this.session.selection.getCursor();
+        if (!position)
+            position = this.session.selection.getCursor();
         var pos = this.session.documentToScreenPosition(position);
         var cursorLeft = Math.round(this.$padding +
                                     pos.column * this.config.characterWidth);
@@ -25304,7 +26516,7 @@ var Cursor = function(parentEl) {
     this.update = function(config) {
         this.config = config;
 
-        this.pixelPos = this.getPixelPosition(true);
+        this.pixelPos = this.getPixelPosition(null, true);
 
         this.cursor.style.left = this.pixelPos.left + "px";
         this.cursor.style.top =  this.pixelPos.top + "px";
@@ -25371,6 +26583,7 @@ exports.Cursor = Cursor;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/scrollbar', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/lib/dom', 'ace/lib/event', 'ace/lib/event_emitter'], function(require, exports, module) {
+"use strict";
 
 var oop = require("./lib/oop");
 var dom = require("./lib/dom");
@@ -25401,7 +26614,7 @@ var ScrollBar = function(parent) {
     oop.implement(this, EventEmitter);
 
     this.onScroll = function() {
-        this._dispatchEvent("scroll", {data: this.element.scrollTop});
+        this._emit("scroll", {data: this.element.scrollTop});
     };
 
     this.getWidth = function() {
@@ -25463,6 +26676,7 @@ exports.ScrollBar = ScrollBar;
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/renderloop', ['require', 'exports', 'module' , 'ace/lib/event'], function(require, exports, module) {
+"use strict";
 
 var event = require("./lib/event");
 
@@ -25484,9 +26698,11 @@ var RenderLoop = function(onRender, win) {
             var _self = this;
             event.nextTick(function() {
                 _self.pending = false;
-                var changes = _self.changes;
-                _self.changes = 0;
-                _self.onRender(changes);
+                var changes;
+                while (changes = _self.changes) {
+                    _self.changes = 0;
+                    _self.onRender(changes);
+                }
             }, this.window);
         }
     };
@@ -25532,24 +26748,41 @@ define("text!ace/css/editor.css", [], "@import url(//fonts.googleapis.com/css?fa
   "    z-index: 4;\n" +
   "}\n" +
   "\n" +
+  ".ace_gutter .ace_layer {\n" +
+  "    position: relative;\n" +
+  "    min-width: 54px;\n" +
+  "    text-align: right;\n" +
+  "}\n" +
+  "\n" +
   ".ace_gutter {\n" +
   "    position: absolute;\n" +
-  "    overflow-x: hidden;\n" +
-  "    overflow-y: hidden;\n" +
+  "    overflow : hidden;\n" +
   "    height: 100%;\n" +
+  "    width: auto;\n" +
   "    cursor: default;\n" +
+  "}\n" +
+  "\n" +
+  ".ace_gutter-cell {\n" +
+  "    padding-left: 19px;\n" +
+  "    padding-right: 6px;\n" +
   "}\n" +
   "\n" +
   ".ace_gutter-cell.ace_error {\n" +
   "    background-image: url(\"data:image/gif,GIF89a%10%00%10%00%D5%00%00%F5or%F5%87%88%F5nr%F4ns%EBmq%F5z%7F%DDJT%DEKS%DFOW%F1Yc%F2ah%CE(7%CE)8%D18E%DD%40M%F2KZ%EBU%60%F4%60m%DCir%C8%16(%C8%19*%CE%255%F1%3FR%F1%3FS%E6%AB%B5%CA%5DI%CEn%5E%F7%A2%9A%C9G%3E%E0a%5B%F7%89%85%F5yy%F6%82%80%ED%82%80%FF%BF%BF%E3%C4%C4%FF%FF%FF%FF%FF%FF%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00!%F9%04%01%00%00%25%00%2C%00%00%00%00%10%00%10%00%00%06p%C0%92pH%2C%1A%8F%C8%D2H%93%E1d4%23%E4%88%D3%09mB%1DN%B48%F5%90%40%60%92G%5B%94%20%3E%22%D2%87%24%FA%20%24%C5%06A%00%20%B1%07%02B%A38%89X.v%17%82%11%13q%10%0Fi%24%0F%8B%10%7BD%12%0Ei%09%92%09%0EpD%18%15%24%0A%9Ci%05%0C%18F%18%0B%07%04%01%04%06%A0H%18%12%0D%14%0D%12%A1I%B3%B4%B5IA%00%3B\");\n" +
   "    background-repeat: no-repeat;\n" +
-  "    background-position: 4px center;\n" +
+  "    background-position: 2px center;\n" +
   "}\n" +
   "\n" +
   ".ace_gutter-cell.ace_warning {\n" +
   "    background-image: url(\"data:image/gif,GIF89a%10%00%10%00%D5%00%00%FF%DBr%FF%DE%81%FF%E2%8D%FF%E2%8F%FF%E4%96%FF%E3%97%FF%E5%9D%FF%E6%9E%FF%EE%C1%FF%C8Z%FF%CDk%FF%D0s%FF%D4%81%FF%D5%82%FF%D5%83%FF%DC%97%FF%DE%9D%FF%E7%B8%FF%CCl%7BQ%13%80U%15%82W%16%81U%16%89%5B%18%87%5B%18%8C%5E%1A%94d%1D%C5%83-%C9%87%2F%C6%84.%C6%85.%CD%8B2%C9%871%CB%8A3%CD%8B5%DC%98%3F%DF%9BB%E0%9CC%E1%A5U%CB%871%CF%8B5%D1%8D6%DB%97%40%DF%9AB%DD%99B%E3%B0p%E7%CC%AE%FF%FF%FF%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00!%F9%04%01%00%00%2F%00%2C%00%00%00%00%10%00%10%00%00%06a%C0%97pH%2C%1A%8FH%A1%ABTr%25%87%2B%04%82%F4%7C%B9X%91%08%CB%99%1C!%26%13%84*iJ9(%15G%CA%84%14%01%1A%97%0C%03%80%3A%9A%3E%81%84%3E%11%08%B1%8B%20%02%12%0F%18%1A%0F%0A%03'F%1C%04%0B%10%16%18%10%0B%05%1CF%1D-%06%07%9A%9A-%1EG%1B%A0%A1%A0U%A4%A5%A6BA%00%3B\");\n" +
   "    background-repeat: no-repeat;\n" +
-  "    background-position: 4px center;\n" +
+  "    background-position: 2px center;\n" +
+  "}\n" +
+  "\n" +
+  ".ace_gutter-cell.ace_info {\n" +
+  "    background-image: url(\"data:image/gif;base64,R0lGODlhEAAQAMQAAAAAAEFBQVJSUl5eXmRkZGtra39/f4WFhYmJiZGRkaampry8vMPDw8zMzNXV1dzc3OTk5Orq6vDw8P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABQALAAAAAAQABAAAAUuICWOZGmeaBml5XGwFCQSBGyXRSAwtqQIiRuiwIM5BoYVbEFIyGCQoeJGrVptIQA7\");\n" +
+  "    background-repeat: no-repeat;\n" +
+  "    background-position: 2px center;\n" +
   "}\n" +
   "\n" +
   ".ace_editor .ace_sb {\n" +
@@ -25662,6 +26895,10 @@ define("text!ace/css/editor.css", [], "@import url(//fonts.googleapis.com/css?fa
   "}\n" +
   "\n" +
   ".ace_line .ace_fold {\n" +
+  "    box-sizing: border-box;\n" +
+  "    -moz-box-sizing: border-box;\n" +
+  "    -webkit-box-sizing: border-box;\n" +
+  "    \n" +
   "    display: inline-block;\n" +
   "    height: 11px;\n" +
   "    margin-top: -2px;\n" +
@@ -25672,13 +26909,12 @@ define("text!ace/css/editor.css", [], "@import url(//fonts.googleapis.com/css?fa
   "        url(\"data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%05%00%00%007%08%06%00%00%00%C4%DD%80C%00%00%03%1EiCCPICC%20Profile%00%00x%01%85T%DFk%D3P%14%FE%DAe%9D%B0%E1%8B%3Ag%11%09%3Eh%91ndStC%9C%B6kW%BA%CDZ%EA6%B7!H%9B%A6m%5C%9A%C6%24%ED~%B0%07%D9%8Bo%3A%C5w%F1%07%3E%F9%07%0C%D9%83o%7B%92%0D%C6%14a%F8%AC%88%22L%F6%22%B3%9E%9B4M'S%03%B9%F7%BB%DF%F9%EE9'%E7%E4%5E%A0%F9qZ%D3%14%2F%0F%14USO%C5%C2%FC%C4%E4%14%DF%F2%01%5E%1CC%2B%FChM%8B%86%16J%26G%40%0F%D3%B2y%EF%B3%F3%0E%1E%C6lt%EEo%DF%AB%FEc%D5%9A%95%0C%11%F0%1C%20%BE%945%C4%22%E1Y%A0i%5C%D4t%13%E0%D6%89%EF%9D15%C2%CDLsX%A7%04%09%1Fg8oc%81%E1%8C%8D%23%96f45%40%9A%09%C2%07%C5B%3AK%B8%408%98i%E0%F3%0D%D8%CE%81%14%E4'%26%A9%92.%8B%3C%ABER%2F%E5dE%B2%0C%F6%F0%1Fs%83%F2_%B0%A8%94%E9%9B%AD%E7%10%8Dm%9A%19N%D1%7C%8A%DE%1F9%7Dp%8C%E6%00%D5%C1%3F_%18%BDA%B8%9DpX6%E3%A35~B%CD%24%AE%11%26%BD%E7%EEti%98%EDe%9A%97Y)%12%25%1C%24%BCbT%AE3li%E6%0B%03%89%9A%E6%D3%ED%F4P%92%B0%9F4%BF43Y%F3%E3%EDP%95%04%EB1%C5%F5%F6KF%F4%BA%BD%D7%DB%91%93%07%E35%3E%A7)%D6%7F%40%FE%BD%F7%F5r%8A%E5y%92%F0%EB%B4%1E%8D%D5%F4%5B%92%3AV%DB%DB%E4%CD%A6%23%C3%C4wQ%3F%03HB%82%8E%1Cd(%E0%91B%0Ca%9Ac%C4%AA%F8L%16%19%22J%A4%D2itTy%B28%D6%3B(%93%96%ED%1CGx%C9_%0E%B8%5E%16%F5%5B%B2%B8%F6%E0%FB%9E%DD%25%D7%8E%BC%15%85%C5%B7%A3%D8Q%ED%B5%81%E9%BA%B2%13%9A%1B%7Fua%A5%A3n%E17%B9%E5%9B%1Bm%AB%0B%08Q%FE%8A%E5%B1H%5Ee%CAO%82Q%D7u6%E6%90S%97%FCu%0B%CF2%94%EE%25v%12X%0C%BA%AC%F0%5E%F8*l%0AO%85%17%C2%97%BF%D4%C8%CE%DE%AD%11%CB%80q%2C%3E%AB%9ES%CD%C6%EC%25%D2L%D2%EBd%B8%BF%8A%F5B%C6%18%F9%901CZ%9D%BE%24M%9C%8A9%F2%DAP%0B'%06w%82%EB%E6%E2%5C%2F%D7%07%9E%BB%CC%5D%E1%FA%B9%08%AD.r%23%8E%C2%17%F5E%7C!%F0%BE3%BE%3E_%B7o%88a%A7%DB%BE%D3d%EB%A31Z%EB%BB%D3%91%BA%A2%B1z%94%8F%DB'%F6%3D%8E%AA%13%19%B2%B1%BE%B1~V%08%2B%B4%A2cjJ%B3tO%00%03%25mN%97%F3%05%93%EF%11%84%0B%7C%88%AE-%89%8F%ABbW%90O%2B%0Ao%99%0C%5E%97%0CI%AFH%D9.%B0%3B%8F%ED%03%B6S%D6%5D%E6i_s9%F3*p%E9%1B%FD%C3%EB.7U%06%5E%19%C0%D1s.%17%A03u%E4%09%B0%7C%5E%2C%EB%15%DB%1F%3C%9E%B7%80%91%3B%DBc%AD%3Dma%BA%8B%3EV%AB%DBt.%5B%1E%01%BB%0F%AB%D5%9F%CF%AA%D5%DD%E7%E4%7F%0Bx%A3%FC%06%A9%23%0A%D6%C2%A1_2%00%00%00%09pHYs%00%00%0B%13%00%00%0B%13%01%00%9A%9C%18%00%00%00%3AIDAT8%11c%FC%FF%FF%7F%18%03%1A%60%01%F2%3F%A0%891%80%04%FF%11-%F8%17%9BJ%E2%05%B1ZD%81v%26t%E7%80%F8%A3%82h%A12%1A%20%A3%01%02%0F%01%BA%25%06%00%19%C0%0D%AEF%D5%3ES%00%00%00%00IEND%AEB%60%82\");\n" +
   "    background-repeat: no-repeat, repeat-x;\n" +
   "    background-position: center center, top left;\n" +
-  "    background-color: #4b50c3;\n" +
   "    color: transparent;\n" +
   "\n" +
   "    border: 1px solid black;\n" +
-  "    -moz-border-radius: 1px;\n" +
-  "    -webkit-border-radius: 1px;\n" +
-  "    border-radius: 1px;\n" +
+  "    -moz-border-radius: 2px;\n" +
+  "    -webkit-border-radius: 2px;\n" +
+  "    border-radius: 2px;\n" +
   "    \n" +
   "    cursor: pointer;\n" +
   "    pointer-events: auto;\n" +
@@ -25700,7 +26936,7 @@ define("text!ace/css/editor.css", [], "@import url(//fonts.googleapis.com/css?fa
   "}\n" +
   "\n" +
   ".ace_folding-enabled .ace_gutter-cell {\n" +
-  "    padding-right: 13px!important;\n" +
+  "    padding-right: 13px;\n" +
   "}\n" +
   "\n" +
   ".ace_fold-widget {\n" +
@@ -25710,13 +26946,15 @@ define("text!ace/css/editor.css", [], "@import url(//fonts.googleapis.com/css?fa
   "\n" +
   "    margin: 0 -12px 1px 1px;\n" +
   "    display: inline-block;\n" +
-  "    height: 15px;\n" +
+  "    height: 14px;\n" +
   "    width: 11px;\n" +
-  "    vertical-align: middle;\n" +
+  "    vertical-align: text-bottom;\n" +
   "    \n" +
   "    background-image: url(\"data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%05%00%00%00%05%08%06%00%00%00%8Do%26%E5%00%00%004IDATx%DAe%8A%B1%0D%000%0C%C2%F2%2CK%96%BC%D0%8F9%81%88H%E9%D0%0E%96%C0%10%92%3E%02%80%5E%82%E4%A9*-%EEsw%C8%CC%11%EE%96w%D8%DC%E9*Eh%0C%151(%00%00%00%00IEND%AEB%60%82\");\n" +
   "    background-repeat: no-repeat;\n" +
   "    background-position: center 5px;\n" +
+  "\n" +
+  "    border-radius: 3px;\n" +
   "}\n" +
   "\n" +
   ".ace_fold-widget.end {\n" +
@@ -25730,7 +26968,6 @@ define("text!ace/css/editor.css", [], "@import url(//fonts.googleapis.com/css?fa
   ".ace_fold-widget:hover {\n" +
   "    border: 1px solid rgba(0, 0, 0, 0.3);\n" +
   "    background-color: rgba(255, 255, 255, 0.2);\n" +
-  "    border-radius: 3px;\n" +
   "    -moz-box-shadow:inset 0 1px 1px rgba(255, 255, 255, 0.7);\n" +
   "    -moz-box-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);\n" +
   "    -webkit-box-shadow:inset 0 1px 1px rgba(255, 255, 255, 0.7);\n" +
@@ -25750,5 +26987,20 @@ define("text!ace/css/editor.css", [], "@import url(//fonts.googleapis.com/css?fa
   "    box-shadow:inset 0 1px 1px rgba(255, 255, 255);\n" +
   "    box-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);\n" +
   "}\n" +
+  "\n" +
+  ".ace_fold-widget.invalid {\n" +
+  "    background-color: #FFB4B4;\n" +
+  "    border-color: #DE5555;\n" +
+  "}\n" +
   "");
 
+;
+            (function() {
+                window.require(["ace/ace"], function(a) {
+                    if (!window.ace)
+                        window.ace = {};
+                    for (var key in a) if (a.hasOwnProperty(key))
+                        ace[key] = a[key];
+                });
+            })();
+        
